@@ -387,7 +387,7 @@ public class AnalyseurStateEvent : EventArgs
 	{
 		public AircraftState()
 		{
-			TimeStamp = DateTime.UtcNow;
+			TimeStamp = Outils.Now;
 			Title = "";
 			Model = "";
 			Type = "";

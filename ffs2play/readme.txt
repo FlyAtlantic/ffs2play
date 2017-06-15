@@ -24,3 +24,5 @@ Ce logiciel utilise également les technologies open-source suivantes :
 Notes de révision:
 
 1.0.0 : Portage de FFSTracker en version Light FFS2Play
+
+1.0.1 : Amélioration de la synchronisation temporelle (Stabilité des AI en vol)

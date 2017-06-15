@@ -288,7 +288,7 @@ namespace ffs2play
 			m_scConnection = null;
 			m_SimStart = false;
 			m_VariableRate = TimeSpan.FromMilliseconds(100);
-			m_LastVariable = DateTime.UtcNow;
+			m_LastVariable = Outils.Now;
 			//m_Thread.IsBackground = true;
 			AIProcess = new Dictionary<uint, string>();
 			Log = Logger.Instance;
@@ -762,8 +762,8 @@ namespace ffs2play
 			switch ((REQUESTS_ID)data.dwRequestID)
 			{
 				case REQUESTS_ID.PERIODIQUE:
-					m_SimRate = DateTime.UtcNow - m_LastSim;
-					m_LastSim = DateTime.UtcNow;
+                    m_LastSim = Outils.Now;
+                    m_SimRate = m_LastSim - m_LastSim;
 					if (m_LastSim >= (m_LastVariable+m_VariableRate))
 					{
 						m_LastVariable = m_LastSim;
@@ -1047,7 +1047,7 @@ namespace ffs2play
 		{
 			FrameRate = pFrameRate;
 			SimSpeed = pSimSpeed;
-			Time = DateTime.UtcNow;
+			Time = Outils.Now;
 		}
 		public float FrameRate;
 		public float SimSpeed;
@@ -1080,13 +1080,13 @@ namespace ffs2play
     {
 		public SCManagerEventSCEvent()
 		{
-			Time = DateTime.UtcNow;
+			Time = Outils.Now;
 		}
 		public SCManagerEventSCEvent (EVENT_ID pEvt_ID, uint pData)
 		{
 			Evt_Id = pEvt_ID;
 			Data = (int)pData;
-			Time = DateTime.UtcNow;
+			Time = Outils.Now;
 		}
 		public EVENT_ID Evt_Id;
 		public int Data;
@@ -1098,7 +1098,7 @@ namespace ffs2play
 		public SCManagerEventSCVariable (DonneesAvion pData)
 		{
 			Data = pData;
-			Time = DateTime.UtcNow;
+			Time = Outils.Now;
 		}
 		public DonneesAvion Data;
 		public DateTime Time;
@@ -1108,13 +1108,13 @@ namespace ffs2play
 	{
 		public SCManagerEventAIUpdate()
 		{
-			Time = DateTime.UtcNow;
+			Time = Outils.Now;
 		}
 		public SCManagerEventAIUpdate(AIMoveStruct pData, uint pObjectID)
 		{
 			Data = pData;
 			ObjectID = pObjectID;
-			Time = DateTime.UtcNow;
+			Time = Outils.Now;
 		}
 		public AIMoveStruct Data;
 		public uint ObjectID;

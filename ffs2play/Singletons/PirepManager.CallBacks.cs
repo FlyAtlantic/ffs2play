@@ -174,7 +174,7 @@ namespace ffs2play
 				Response.Close();
 			}
 			if (xmlDoc == null) return;
-			LastGoodUpdate = DateTime.UtcNow;
+			LastGoodUpdate = Outils.Now;
 			CheckError(xmlDoc);
 			// On charge la liste des joueurs depuis le wazzup
 			XmlNode Wazzup = GetFirstElement(ref xmlDoc, "whazzup");

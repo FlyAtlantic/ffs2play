@@ -40,7 +40,7 @@ namespace ffs2play
 
 		private void SendPing()
 		{
-			m_LastPing = DateTime.UtcNow;
+			m_LastPing = Outils.Now;
 			MemoryStream Output = new MemoryStream();
 			BinaryWriter BOutput = new BinaryWriter(Output);
 			BOutput.Write((byte)Protocol.PING);

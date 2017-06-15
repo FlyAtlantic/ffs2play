@@ -186,8 +186,8 @@ namespace ffs2play
 			HeartBeat.Start();
 			m_TimerCreateAI = new System.Timers.Timer(5000);
 			m_TimerCreateAI.Elapsed += OnTimerCreateAI;
-			m_LastData = DateTime.UtcNow;
-			m_LastStateEvent = DateTime.UtcNow;
+			m_LastData = Outils.Now;
+			m_LastStateEvent = m_LastData;
 			m_Counter = 0;
 			m_Counter_In = 0;
 			m_Counter_Out = 0;
@@ -683,7 +683,7 @@ namespace ffs2play
         {
             public AirData()
             {
-                TimeStamp = DateTime.UtcNow;
+                TimeStamp = Outils.Now;
                 Title = "";
                 Model = "";
                 Type = "";

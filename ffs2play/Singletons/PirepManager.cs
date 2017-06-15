@@ -95,7 +95,7 @@ namespace ffs2play
 			AutoExit = false;
 			m_SyncAIDone = false;
 			Log = Logger.Instance;
-			LastGoodUpdate = DateTime.UtcNow;
+			LastGoodUpdate = Outils.Now;
 			Mapping = AIMapping.Instance;
 			try
 			{

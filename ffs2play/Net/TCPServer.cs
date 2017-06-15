@@ -252,7 +252,7 @@ namespace ffs2play
         {
             Client = p_Client;
             Data = p_Data;
-            Time = DateTime.UtcNow;
+            Time = Outils.Now;
         }
     }
 }

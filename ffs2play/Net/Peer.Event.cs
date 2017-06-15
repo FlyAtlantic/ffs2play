@@ -160,7 +160,7 @@ namespace ffs2play
 		private void OnHeartBeat(object source, ElapsedEventArgs evt)
 		{
 			SendPing();
-			TimeSpan IntervalAI = DateTime.UtcNow - m_LastAIUpdate;
+			TimeSpan IntervalAI = Outils.Now - m_LastAIUpdate;
 			if ((m_Spawned >=6) && (IntervalAI.TotalSeconds > 20))
 			{
 				Spawn_AI(false);
@@ -195,7 +195,7 @@ namespace ffs2play
 					m_ObjectID = e.Object_ID;
 					m_Spawned = 4;
 					//m_SC.Update_AI(m_ObjectID, DEFINITIONS_ID.AI_INIT, m_InitAI);
-					m_LastAIUpdate = DateTime.UtcNow;
+					m_LastAIUpdate = Outils.Now;
 #if DEBUG
 					Log.LogMessage("Peer [" + CallSign + "] Reçu Object_ID = " + m_ObjectID.ToString(), Color.DarkBlue, 1);
 #endif

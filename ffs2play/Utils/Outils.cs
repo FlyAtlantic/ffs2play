@@ -20,6 +20,20 @@ namespace ffs2play
 	}
 	class Outils
 	{
+        static private DateTime Last_UTC_Now=DateTime.UtcNow;
+        static private long LastTicks= Last_UTC_Now.Ticks;
+        static public DateTime Now
+        {
+            get
+            {
+                if (DateTime.UtcNow.Ticks != Last_UTC_Now.Ticks)
+                {
+                    Last_UTC_Now = DateTime.UtcNow;
+
+                }
+                return Last_UTC_Now;
+            }
+        }
 		static public sVersion GetVersion()
 		{
 			sVersion resultat;
