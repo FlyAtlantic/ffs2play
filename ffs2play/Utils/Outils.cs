@@ -29,7 +29,6 @@ namespace ffs2play
                 if (DateTime.UtcNow.Ticks != Last_UTC_Now.Ticks)
                 {
                     Last_UTC_Now = DateTime.UtcNow;
-
                 }
                 return Last_UTC_Now;
             }

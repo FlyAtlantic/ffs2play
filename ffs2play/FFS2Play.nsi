@@ -72,7 +72,7 @@ Section "SectionPrincipale" SEC01
   File ".\bin\x86\Release\Open.Nat.dll"
   File ".\bin\x86\Release\System.Data.SQLite.dll"
   File ".\bin\x86\Release\protobuf-net.dll"
-  File "..\packages\System.Data.SQLite.Core.1.0.105.0\build\net451\x86\SQLite.Interop.dll"
+  File ".\bin\x86\Release\x86\SQLite.Interop.dll"
   File ".\bin\x86\Release\SharpCompress.dll"
   File "readme.txt"
 SectionEnd
