@@ -100,8 +100,8 @@ namespace ffs2play
 			SetAllowUnsafeHeaderParsing20();
 
 			// Copy user settings from previous application version if necessary
-			settings = Properties.Settings.Default;
-			if ((bool)settings["UpgradeRequired"] == true)
+			settings = Settings.Default;
+            if ((bool)settings["UpgradeRequired"] == true)
 			{
 				// upgrade the settings to the latest version
 				settings.Upgrade();
@@ -140,7 +140,9 @@ namespace ffs2play
                     Size = Properties.Settings.Default.WindowPosition.Size;
                 }
             }
-			// La fenêtre est configurée
+            // Mise à jour de l'option Météo Automatique
+            cbEnaAutoWeather.Checked= Settings.Default.MetarAutoEnable;
+            // La fenêtre est configurée
             windowInitialized = true;
 
 			log = Logger.Instance;
@@ -546,5 +548,29 @@ namespace ffs2play
 		{
 			System.Diagnostics.Process.Start("http://ffs2p.ffsimulateur2.fr/viewtopic.php?f=209&t=14308");
 		}
-	}
+
+        /// <summary>
+        /// Gestion de la mise à jour automatique de la météo
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cbEnaAutoWeather_CheckedChanged(object sender, EventArgs e)
+        {
+            Settings.Default.MetarAutoEnable = cbEnaAutoWeather.Checked;
+            settings.Save();
+        }
+
+        /// <summary>
+        /// Envoie de la méto via le champs de saisie
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnEnvoyerMetar_Click(object sender, EventArgs e)
+        {
+            if (tbMetarManuel.Text.Length>4)
+            {
+                pm.SendMetar(tbMetarManuel.Text);
+            }
+        }
+    }
 }

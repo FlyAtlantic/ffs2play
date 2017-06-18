@@ -3,7 +3,10 @@ using System.Windows.Forms;
 using System.Timers;
 using System.Xml;
 using System.Drawing;
-
+using ffs2play.Properties;
+using System.Collections.Generic;
+using ENG.WMOCodes.Decoders;
+using ENG.WMOCodes.Codes;
 
 namespace ffs2play
 {
@@ -54,7 +57,6 @@ namespace ffs2play
 
 		// Etat de la connexion
 		private bool m_bConnected;
-
 		private Logger Log;
 		private AIMapping Mapping;
 
@@ -63,14 +65,12 @@ namespace ffs2play
 		private bool m_SyncAIDone;
 		public bool DelayedExit;
 		private AnalyseurManager Analyse;
-
-		private string m_sURL;
+        private string m_sURL;
         private string Key;
 
         private string m_sAESKey;
         private string Crypted_AESKey;
 		private DateTime LastGoodUpdate;
-
 		private PirepUser User;
         private XmlDocument SendHello;
         private XmlDocument SendVerify;
@@ -96,12 +96,14 @@ namespace ffs2play
 			m_SyncAIDone = false;
 			Log = Logger.Instance;
 			LastGoodUpdate = Outils.Now;
-			Mapping = AIMapping.Instance;
+            Mapping = AIMapping.Instance;
 			try
 			{
 				if ((m_btnConnect = ffs2play.getControl("btnConPirep") as Button) != null) m_btnConnect.Click += btnConPirep_Click;
-				else throw new System.InvalidOperationException("Le bouton btnConPirep n'existe pas");
-			}
+				else throw new InvalidOperationException("Le bouton btnConPirep n'existe pas");
+                if ((m_rtbDecryptedMetar = ffs2play.getControl("rtbDecryptedMetar") as RichTextBox) == null) throw new InvalidOperationException("Le contrôle richttextbox rtbDecryptedMetar n'existe pas");
+                if ((m_tbMetar = ffs2play.getControl("tbMetarManuel") as TextBox) == null) throw new InvalidOperationException("Le contrôle tbMetarManuel n'existe pas");
+            }
 			catch (Exception e)
             {
 				Log.LogMessage("Erreur Constructeur PirepManager : " + e.Message);
@@ -326,6 +328,80 @@ namespace ffs2play
 				Requete.Start();
 			}
 		}
+
+        /// <summary>
+        /// Met à jour le moteur Météo
+        /// </summary>
+        /// <param name="Metar"></param>
+
+        private void MetarUpdate(ref XmlNode MetarNode)
+        {
+            if ((MetarNode == null) || (!Settings.Default.MetarAutoEnable)) return;
+            DateTime MetarTime = new DateTime();
+            string sMetar = "";
+            foreach (XmlNode node in MetarNode.ChildNodes)
+            {
+                string Name = node.Name;
+                foreach (XmlAttribute Att in node.Attributes)
+                {
+                    switch (Att.Name)
+                    {
+                        case "time":
+                            {
+                                try
+                                {
+                                    MetarTime = DateTime.Parse(Att.Value);
+                                }
+                                catch (FormatException e)
+                                {
+                                    Log.LogMessage("PManager: Metar date error : " + e.Message, Color.DarkViolet);
+                                }
+                                break;
+                            }
+                        case "raw":
+                            {
+                                sMetar = Att.Value;
+                                break;
+                            }
+                    }
+                }
+#if DEBUG
+                Log.LogMessage("PManager: reçu Metar " + Name + " heure = " + MetarTime.ToUniversalTime() + " Contenu = " + sMetar, Color.DarkBlue, 2);
+#endif
+                m_tbMetar.Invoke(new Action(() => { m_tbMetar.Text = sMetar; }));
+                SendMetar(sMetar);
+            }
+            
+        }
+
+        public void SendMetar (string pMetar)
+        {
+            Metar mtr = null;
+            MetarDecoder decoder = new MetarDecoder();
+            try
+            {
+                mtr = decoder.Decode("METAR " + pMetar);
+                m_rtbDecryptedMetar.Invoke(new Action(() =>
+                {
+                    ENG.WMOCodes.Formatters.ShortInfoFormatter.MetarFormatter formatter =
+                        new ENG.WMOCodes.Formatters.ShortInfoFormatter.MetarFormatter();
+                    m_rtbDecryptedMetar.Clear();
+                    m_rtbDecryptedMetar.Text = formatter.ToString(mtr);
+                    //m_rtbDecryptedMetar.AppendText(Environment.NewLine + "Sanity check error: " + Environment.NewLine);
+                }));
+            }
+            catch (Exception e)
+            {
+                Log.LogMessage("PManager Metar Exception : " + e.Message, Color.DarkViolet);
+            }
+            
+            /*List<string> er = new List<string>();
+            List<string> w = new List<string>();
+            mtr.SanityCheck(ref er, ref w);
+            er.ForEach(i => m_rtbDecryptedMetar.AppendText("Sanity check error: "+ i + Environment.NewLine));
+            w.ForEach(i => m_rtbDecryptedMetar.AppendText("Sanity check warning: " + i + Environment.NewLine));*/
+            SCM.SendWeatherObservation(pMetar);
+        }
 
 		/// <summary>
 		/// Construit le patron 

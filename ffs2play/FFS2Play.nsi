@@ -74,6 +74,14 @@ Section "SectionPrincipale" SEC01
   File ".\bin\x86\Release\protobuf-net.dll"
   File ".\bin\x86\Release\x86\SQLite.Interop.dll"
   File ".\bin\x86\Release\SharpCompress.dll"
+  File ".\bin\x86\Release\ENG.WMOCodes.Decoders.dll"
+  File ".\bin\x86\Release\ENG.WMOCodes.dll"
+  File ".\bin\x86\Release\ENG.WMOCodes.Downloaders.dll"
+  File ".\bin\x86\Release\ENG.WMOCodes.Formatters.dll"
+  File ".\bin\x86\Release\ENG.WMOCodes.Formatters.InfoFormatter.dll"
+  File ".\bin\x86\Release\ENG.WMOCodes.Formatters.ShortInfo.dll"
+  File ".\bin\x86\Release\ESystem.dll"
+  File ".\bin\x86\Release\ESystem.Extensions.dll"
   File "readme.txt"
 SectionEnd
 

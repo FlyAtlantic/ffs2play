@@ -166,22 +166,32 @@ namespace ffs2play
 		/// <param name="asyncResult"></param>
 		private void LiveUpdateCB(HttpWebResponse Response)
 		{
+            // Si pas connecté au serveur on ignore le CB
 			if (!m_bConnected) return;
 			XmlDocument xmlDoc=null;
+            // On récupère le contenu XML
 			if (Response != null)
 			{
 				xmlDoc = GetResultXml(ref Response);
 				Response.Close();
 			}
+            // Si le contenu est vide on ignore le CB
 			if (xmlDoc == null) return;
+
 			LastGoodUpdate = Outils.Now;
-			CheckError(xmlDoc);
+            //On vérifie les erreurs retournées par le serveur
+			if (CheckError(xmlDoc))
+            {
+                Disconnect();
+                return;
+            }
 			// On charge la liste des joueurs depuis le wazzup
 			XmlNode Wazzup = GetFirstElement(ref xmlDoc, "whazzup");
 			if (Wazzup != null)
 			{
 				P2P.Wazzup_Update(Wazzup,m_sAESKey);
 			}
+            //On synchronise le serveur avec les AI disponibles
 			if ((!m_SyncAIDone) && m_AIManagement)
 			{
 				if (!Mapping.IsInit) return;
@@ -205,10 +215,16 @@ namespace ffs2play
 				Log.LogMessage("PManager: Synchronisation des AI : \n" + Beautify(SendSyncAI), Color.DarkRed, 2);
 #endif
 			}
+            // On check la méteo
+            XmlNode Metar = GetFirstElement(ref xmlDoc, "metar");
+            if (Metar != null)
+            {
+                MetarUpdate(ref Metar);
+            }
 		}
 
 		/// <summary>
-		/// Callback Requete de mise à jour
+		/// Callback Requete de mise à jour ATC
 		/// </summary>
 		/// <param name="asyncResult"></param>
 		private void ATCCB(HttpWebResponse Response)

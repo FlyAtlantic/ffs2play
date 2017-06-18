@@ -10,7 +10,8 @@ namespace ffs2play
     public partial class PirepManager
     {
         private Button m_btnConnect;
-
+        private RichTextBox m_rtbDecryptedMetar;
+        private TextBox m_tbMetar;
         /// <summary>
         /// Event Click sur le bouton de connexion au serveur VMS
         /// En fonction de l'état de connexion, on lance la connexion

@@ -276,7 +276,7 @@ namespace ffs2play
 
 		private const float m_TimeToScroll = 10.0F;
 		private List<string> m_MessageBuffer;
-
+        private string m_Last_Metar;
 
 		/// <summary>
 		/// Constructeur du Singleton
@@ -455,18 +455,19 @@ namespace ffs2play
         {
  			// Programmation des callbacks
 			// Définition de la méthode à appeller sur un évenement de démarrage du simulateur*/
-			m_scConnection.OnRecvOpen += new SimConnect.RecvOpenEventHandler(OnRecvOpen);
+			m_scConnection.OnRecvOpen += OnRecvOpen;
 			// Définition de la méthode à appeller sur un arrêt du simulateur
-			m_scConnection.OnRecvQuit += new SimConnect.RecvQuitEventHandler(OnRecvQuit);
+			m_scConnection.OnRecvQuit += OnRecvQuit;
 			// Définition de la méthode à appeller d'une exception
-			m_scConnection.OnRecvException += new SimConnect.RecvExceptionEventHandler(OnRecvException);
+			m_scConnection.OnRecvException += OnRecvException;
 			// Définition de la méthode à apperller pour la récéption des données
-			m_scConnection.OnRecvSimobjectData += new SimConnect.RecvSimobjectDataEventHandler(OnRecvSimobjectData);
-			m_scConnection.OnRecvEvent += new SimConnect.RecvEventEventHandler(OnRecvEvent);
-			m_scConnection.OnRecvSystemState += new SimConnect.RecvSystemStateEventHandler(OnRecvSystemState);
-			m_scConnection.OnRecvAssignedObjectId += new SimConnect.RecvAssignedObjectIdEventHandler(OnRecvAssignedObjectId);
-			m_scConnection.OnRecvEventObjectAddremove += new SimConnect.RecvEventObjectAddremoveEventHandler(OnRecvEventObjectAddremove);
-			m_scConnection.OnRecvEventFrame += new SimConnect.RecvEventFrameEventHandler(OnRecvEventFrame);
+			m_scConnection.OnRecvSimobjectData += OnRecvSimobjectData;
+			m_scConnection.OnRecvEvent += OnRecvEvent;
+			m_scConnection.OnRecvSystemState += OnRecvSystemState;
+			m_scConnection.OnRecvAssignedObjectId += OnRecvAssignedObjectId;
+			m_scConnection.OnRecvEventObjectAddremove += OnRecvEventObjectAddremove;
+			m_scConnection.OnRecvEventFrame += OnRecvEventFrame;
+            m_scConnection.OnRecvWeatherObservation += OnRecvWeatherObservation;
 
 #if P3D
 			m_scConnection.OnRecvJoystickDeviceInfo += new SimConnect.RecvJoystickDeviceInfoEventHandler(OnRecvJoystickDeviceInfo);
@@ -634,6 +635,13 @@ namespace ffs2play
 			m_scConnection.RequestJoystickDeviceInfo(REQUESTS_ID.JOY_INFO);
 #endif
 		}
+
+        private void OnRecvWeatherObservation(SimConnect sender, SIMCONNECT_RECV_WEATHER_OBSERVATION data)
+        {
+#if DEBUG
+            Log.LogMessage("SCManager: Reçu un Metar = " + data.szMetar, Color.Blue, 2);
+#endif
+        }
 #if P3D
 		private void OnRecvJoystickDeviceInfo(SimConnect sender, SIMCONNECT_RECV_JOYSTICK_DEVICE_INFO info)
 		{
@@ -670,7 +678,7 @@ namespace ffs2play
 			m_scConnection.SetInputGroupState(GROUP_ID.JOYSTICK, 1);
 		}
 #endif
-		private void OnRecvEventObjectAddremove(SimConnect sender, SIMCONNECT_RECV_EVENT_OBJECT_ADDREMOVE data)
+        private void OnRecvEventObjectAddremove(SimConnect sender, SIMCONNECT_RECV_EVENT_OBJECT_ADDREMOVE data)
 		{
 			switch ((EVENT_ID)data.uEventID)
 			{
@@ -823,7 +831,7 @@ namespace ffs2play
 #if DEBUG
 			Log.LogMessage("SCManager: Erreur SimConnect: " + ((SIMCONNECT_EXCEPTION)(data.dwException)).ToString() +
 				" , Send ID = " + data.dwSendID.ToString() +
-				" , Index = " + data.dwIndex.ToString(), Color.DarkViolet, 1);
+				" , Index = " + data.dwIndex.ToString(), Color.DarkViolet,2);
 
 #endif
 			//closeConnection();
@@ -970,6 +978,24 @@ namespace ffs2play
 			}
 			return false;
 		}
+
+        public void SendWeatherObservation(string Metar)
+        {
+            if (m_bConnected)
+            {
+                if (Metar != m_Last_Metar)
+                {
+                    m_Last_Metar = Metar;
+                    m_scConnection.WeatherSetModeCustom();
+                    m_scConnection.WeatherSetModeGlobal();
+                    Metar = Metar.Replace(Metar.Substring(0, 4), "GLOB");
+#if DEBUG
+                    Log.LogMessage("SCManager : Send metar = " + Metar, Color.Blue, 2);
+#endif
+                    m_scConnection.WeatherSetObservation(10, Metar);
+                }
+            }
+        }
 
 		/// <summary>
 		/// Déclenche une notification en internet d'un événement reçu du simulateur
