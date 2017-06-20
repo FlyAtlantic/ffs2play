@@ -18,6 +18,7 @@ namespace ffs2play
 		FSX_STEAM,
 		P3D_V2,
 		P3D_V3,
+        P3D_V4,
 		UNKNOWN
 	}
 
@@ -369,6 +370,8 @@ namespace ffs2play
 					return SIM_VERSION.P3D_V2;
 				case 3:
 					return SIM_VERSION.P3D_V3;
+                case 4:
+                    return SIM_VERSION.P3D_V4;
 				case 10:
 					return SIM_VERSION.FSX;
 				default:

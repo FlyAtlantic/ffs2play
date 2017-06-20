@@ -336,35 +336,17 @@ namespace ffs2play
 			if (flag)
 			{
 				if (m_bUPNP) return;
-#if NET45
 				var t = Task.Run(async () =>
 				{
-#endif
-				var nat = new NatDiscoverer();
-				var cts = new CancellationTokenSource();
-#if NET45
+				    var nat = new NatDiscoverer();
+				    var cts = new CancellationTokenSource();
                     try
                     {
 					Device = await nat.DiscoverDeviceAsync(PortMapper.Upnp, cts);
-#else
-				cts.CancelAfter(3000);
-				Device = null;
-				Task<NatDevice> Discoverer = nat.DiscoverDeviceAsync(PortMapper.Upnp, cts);
-				try
-				{
-					Discoverer.Wait();
-#endif
-
 #if DEBUG
 					Log.LogMessage("P2PManager: Routeur UPNP détecté", Color.DarkBlue, 1);
 #endif
-#if NET45
-                        await Device.CreatePortMapAsync(new Mapping(Open.Nat.Protocol.Udp, m_Port, m_Port, 0, "ffs2playP3D"));
-#else
-					Device = Discoverer.Result;
-					Task OpenPort = Device.CreatePortMapAsync(new Mapping(Open.Nat.Protocol.Udp, m_Port, m_Port, 0, "ffs2play"));
-					OpenPort.Wait();
-#endif
+                    await Device.CreatePortMapAsync(new Mapping(Open.Nat.Protocol.Udp, m_Port, m_Port, 0, "ffs2playP3D"));
 #if DEBUG
 					Log.LogMessage("P2PManager: Ouverture du port UPNP ok", Color.DarkBlue, 1);
 #endif
@@ -387,45 +369,34 @@ namespace ffs2play
 						});
 					}
 					m_bUPNP = true;
-#if NET45
                 });
-#endif
 			}
 			else
 			{
 				if ((!m_bUPNP) || (Device==null)) return;
-#if NET45
                 var t = Task.Run(async () =>
 				{
-#endif
-				try
-				{
-#if NET45
+				    try
+				    {
                         await Device.DeletePortMapAsync(new Mapping(Open.Nat.Protocol.Udp, m_Port, m_Port));
-#else
-					Task ClosePort = Device.DeletePortMapAsync(new Mapping(Open.Nat.Protocol.Udp, m_Port, m_Port));
-					ClosePort.Wait();
-#endif
 #if DEBUG
 					Log.LogMessage("P2PManager: Fermeture du port UPNP ok", Color.DarkBlue, 1);
 #endif
-				}
-				catch (AggregateException ae)
-				{
-					ae.Handle((x) =>
-					{
-						if (x is MappingException)
-						{
-							Log.LogMessage("P2PManager: Erreur lors de la fermetur du port", Color.DarkViolet);
-							return true;
-						}
-						return false;
-					});
-				}
-				m_bUPNP = false;
-#if NET45
+				    }
+				    catch (AggregateException ae)
+				    {
+    					ae.Handle((x) =>
+					    {
+    						if (x is MappingException)
+						    {
+    							Log.LogMessage("P2PManager: Erreur lors de la fermetur du port", Color.DarkViolet);
+							    return true;
+						    }
+    						return false;
+	    				});
+		    		}
+			    	m_bUPNP = false;
                 });
-#endif
 			}
 		}
 

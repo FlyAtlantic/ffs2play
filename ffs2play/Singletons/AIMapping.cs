@@ -66,7 +66,7 @@ namespace ffs2play
 			m_SC.OnSCReceiveOpen += OnSCReceiveOpen;
 			// On localise l'installateur de chaque simulateur
 			string BaseRegistryPath = "";
-			BaseInstallation = new string[4];
+			BaseInstallation = new string[5];
 			Object Valeur = null;
 			RegistryKey registryKey = null;
 			/// todo : inverser la priorité lockeed wow6432 pour prioriser une nouvelle install
@@ -162,7 +162,27 @@ namespace ffs2play
 					}
 				}
 			}
-		}
+            if (Properties.Settings.Default.AIScanFoldersP3DV4.Count < 1)
+            {
+                registryKey = Registry.LocalMachine.OpenSubKey(BaseRegistryPath + "Lockheed Martin\\Prepar3D v4");
+                if (registryKey != null)
+                {
+                    Valeur = registryKey.GetValue("SetupPath");
+                    if (Valeur == null) Valeur = registryKey.GetValue("AppPath");
+                    if (Valeur != null)
+                    {
+                        BaseInstallation[4] = (string)Valeur;
+                        if (!BaseInstallation[4].EndsWith("\\")) BaseInstallation[4] += "\\";
+                        Properties.Settings.Default.AIScanFoldersP3DV4.Add(BaseInstallation[4] + "SimObjects\\Airplanes");
+                        Properties.Settings.Default.AIScanFoldersP3DV4.Add(BaseInstallation[4] + "SimObjects\\Rotorcraft");
+                        Properties.Settings.Default.Save();
+#if DEBUG
+                        Log.LogMessage("AIMapping : Répertoire d'installation Prepar3D v4 trouvé :  = " + BaseInstallation[4], Color.DarkBlue, 1);
+#endif
+                    }
+                }
+            }
+        }
 
 		private void OnSCReceiveOpen(object sender, SCManagerEventOpen e)
 		{
@@ -182,7 +202,10 @@ namespace ffs2play
 						break;
 					case SIM_VERSION.P3D_V3:
 						m_AircraftPath = Properties.Settings.Default.AIScanFoldersP3DV3;
-						break;
+                        break;
+                    case SIM_VERSION.P3D_V4:
+                        m_AircraftPath = Properties.Settings.Default.AIScanFoldersP3DV4;
+                        break;
 				}
 #if DEBUG
 				Log.LogMessage("AIMapping : Simulateur détecté: " + m_Table, Color.DarkOliveGreen, 1);

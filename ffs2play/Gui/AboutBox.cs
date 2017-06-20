@@ -6,13 +6,18 @@ namespace ffs2play
 {
 	partial class AboutBox : Form
 	{
-		public AboutBox()
+#if PLATFORM_X86
+        private const string Platform = "X86";
+#elif PLATFORM_X64
+        private const string Platform = "X64";
+#endif
+        public AboutBox()
 		{
-			InitializeComponent();
+            InitializeComponent();
 			AssemblyInfo entryAssemblyInfo = new AssemblyInfo(Assembly.GetEntryAssembly());
 			this.Text = String.Format("À propos de {0}", entryAssemblyInfo.ProductTitle);
 			this.labelProductName.Text = entryAssemblyInfo.Product;
-			this.labelVersion.Text = String.Format("Version {0}", entryAssemblyInfo.Version);
+			this.labelVersion.Text = String.Format("Version {0}", entryAssemblyInfo.Version) + " " + Platform;
 			this.labelCopyright.Text = entryAssemblyInfo.Copyright;
 			this.labelCompanyName.Text = "http://www.ffsimulateur2.fr";
 			this.textBoxDescription.Text = entryAssemblyInfo.Description;
