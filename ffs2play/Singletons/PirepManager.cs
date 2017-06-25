@@ -350,7 +350,7 @@ namespace ffs2play
                             {
                                 try
                                 {
-                                    MetarTime = DateTime.Parse(Att.Value);
+                                    DateTime.TryParse (Att.Value,out MetarTime);
                                 }
                                 catch (FormatException e)
                                 {

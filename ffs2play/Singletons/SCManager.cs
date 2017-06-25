@@ -990,12 +990,15 @@ namespace ffs2play
                 {
                     m_Last_Metar = Metar;
                     m_scConnection.WeatherSetModeCustom();
-                    m_scConnection.WeatherSetModeGlobal();
-                    Metar = Metar.Replace(Metar.Substring(0, 4), "GLOB");
+                    //m_scConnection.WeatherSetModeGlobal();
+                    //Metar = Metar.Replace(Metar.Substring(0, 4), "GLOB");
+                    //Nettoyage du metar
+                    if (Metar.Contains("AUTO")) Metar = Metar.Replace("AUTO", "");
+                    if (Metar.Contains("NOSIG")) Metar = Metar.Replace("NOSIG", "");
 #if DEBUG
-                    Log.LogMessage("SCManager : Send metar = " + Metar, Color.Blue, 2);
+                    Log.LogMessage("SCManager : Send metar = " + Metar, Color.Blue, 1);
 #endif
-                    m_scConnection.WeatherSetObservation(10, Metar);
+                    m_scConnection.WeatherSetObservation(1, Metar);
                 }
             }
         }

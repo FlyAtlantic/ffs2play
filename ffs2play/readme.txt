@@ -28,3 +28,7 @@ Notes de révision:
 1.0.1 : Amélioration de la synchronisation temporelle (Stabilité des AI en vol)
 
 1.0.2 : Ajout d'un moteur Météo expérimental
+
+1.0.3 : Support V4 de P3D
+
+1.0.4 : Résolution bugs divers météo
