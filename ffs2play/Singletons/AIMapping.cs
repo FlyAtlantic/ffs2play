@@ -58,6 +58,64 @@ namespace ffs2play
 			internal static readonly AIMapping instance = new AIMapping();
 		}
 
+        /// <summary>
+        /// Retrouve l'entrée dans la base de registre du simulateur
+        /// </summary>
+        /// <param name="Key"></param>
+        /// <param name="SubKey"></param>
+        /// <returns></returns>
+
+        private string FindInstallationPath (string Key)
+        {
+            try
+            {
+                RegistryKey registryKey = Registry.LocalMachine.OpenSubKey("Software\\WOW6432Node\\" + Key);
+                if (registryKey == null)
+                {
+                    registryKey = Registry.LocalMachine.OpenSubKey("Software\\" + Key);
+                    if (registryKey == null)
+                    {
+#if DEBUG
+                        Log.LogMessage("AIMapping : Simulateur " + Key + " introuvable" , Color.DarkOliveGreen,1);
+#endif
+                        return "";
+                    }
+                }
+                // 1ere recherche de la clé "Install_Path"
+                string Reponse = (string)registryKey.GetValue("Install_Path");
+                if (Reponse == null)
+                {
+#if DEBUG
+                    Log.LogMessage("AIMapping : Clé \"Install_Path\" introuvable dans " + Key, Color.DarkOliveGreen, 1);
+#endif
+                    // 2ème recherche de la clé "SetupPath"
+                    Reponse = (string)registryKey.GetValue("SetupPath");
+                    if (Reponse == null)
+                    {
+#if DEBUG
+                        Log.LogMessage("AIMapping : Clé \"SetupPath\" introuvable dans " + Key, Color.DarkOliveGreen, 1);
+#endif
+                        // 3ème recherche de la clé "AppPath"
+                        Reponse = (string)registryKey.GetValue("AppPath");
+                        if (Reponse == null)
+                        {
+#if DEBUG
+                            Log.LogMessage("AIMapping : Clé \"AppPath\" introuvable dans " + Key, Color.DarkOliveGreen, 1);
+#endif
+                            return "";
+                        }
+                    }
+                }
+                if (!Reponse.EndsWith("\\")) Reponse += "\\";
+                return Reponse;
+            }
+            catch (ObjectDisposedException e)
+            {
+                Log.LogMessage("AIMapping : Erreur accès à la base de registre = " + e.Message, Color.DarkViolet);
+                return "";
+            }
+        }
+
 		private AIMapping()
 		{
 			m_Initialized = false;
@@ -65,121 +123,75 @@ namespace ffs2play
 			m_SC = SCManager.Instance;
 			m_SC.OnSCReceiveOpen += OnSCReceiveOpen;
 			// On localise l'installateur de chaque simulateur
-			string BaseRegistryPath = "";
 			BaseInstallation = new string[5];
-			Object Valeur = null;
-			RegistryKey registryKey = null;
-			/// todo : inverser la priorité lockeed wow6432 pour prioriser une nouvelle install
-			try
-			{
-				registryKey = Registry.LocalMachine.OpenSubKey("Software\\WOW6432Node");
-				if (registryKey == null) BaseRegistryPath = "Software\\";
-				else BaseRegistryPath = "Software\\WOW6432Node\\";
-			}
-			catch (ObjectDisposedException e)
-			{
-				Log.LogMessage("AIMapping : Erreur accès à la base de registre = " + e.Message, Color.DarkViolet);
-			}
 			//Check for FSX Installation
 			if (Properties.Settings.Default.AIScanFoldersFSX.Count < 1)
 			{
-				registryKey = Registry.LocalMachine.OpenSubKey(BaseRegistryPath + "Microsoft\\Microsoft Games\\Flight Simulator\\10.0");
-				if (registryKey != null)
+                BaseInstallation[0] = FindInstallationPath("Microsoft\\Microsoft Games\\Flight Simulator\\10.0");
+                if (BaseInstallation[0].Length >0)
 				{
-					Valeur = registryKey.GetValue("SetupPath");
-					if (Valeur != null)
-					{
-						BaseInstallation[0] = (string)Valeur;
-						if (!BaseInstallation[0].EndsWith("\\")) BaseInstallation[0] += "\\";
-						Properties.Settings.Default.AIScanFoldersFSX.Add(BaseInstallation[0] + "SimObjects\\Airplanes");
-						Properties.Settings.Default.AIScanFoldersFSX.Add(BaseInstallation[0] + "SimObjects\\Rotorcraft");
-						Properties.Settings.Default.Save();
+					Properties.Settings.Default.AIScanFoldersFSX.Add(BaseInstallation[0] + "SimObjects\\Airplanes");
+					Properties.Settings.Default.AIScanFoldersFSX.Add(BaseInstallation[0] + "SimObjects\\Rotorcraft");
+					Properties.Settings.Default.Save();
 #if DEBUG
-						Log.LogMessage("AIMapping : Répertoire d'installation FSX trouvé :  = " + BaseInstallation[0], Color.DarkBlue, 1);
+					Log.LogMessage("AIMapping : Répertoire d'installation FSX trouvé :  = " + BaseInstallation[0], Color.DarkBlue, 1);
 #endif
-					}
 				}
 			}
 
 			//Vérification installation de FSX Steam
 			if (Properties.Settings.Default.AIScanFoldersFSXSE.Count < 1)
 			{
-				registryKey = Registry.LocalMachine.OpenSubKey(BaseRegistryPath + "DovetailGames\\FSX");
-				if (registryKey != null)
-				{
-					Valeur = registryKey.GetValue("Install_Path");
-					if (Valeur != null)
-					{
-						BaseInstallation[1] = (string)Valeur;
-						if (!BaseInstallation[1].EndsWith("\\")) BaseInstallation[1] += "\\";
-						Properties.Settings.Default.AIScanFoldersFSXSE.Add(BaseInstallation[1] + "SimObjects\\Airplanes");
-						Properties.Settings.Default.AIScanFoldersFSXSE.Add(BaseInstallation[1] + "SimObjects\\Rotorcraft");
-						Properties.Settings.Default.Save();
+                BaseInstallation[1] = FindInstallationPath("DovetailGames\\FSX");
+                if (BaseInstallation[1].Length > 0)
+                {
+ 					if (!BaseInstallation[1].EndsWith("\\")) BaseInstallation[1] += "\\";
+					Properties.Settings.Default.AIScanFoldersFSXSE.Add(BaseInstallation[1] + "SimObjects\\Airplanes");
+					Properties.Settings.Default.AIScanFoldersFSXSE.Add(BaseInstallation[1] + "SimObjects\\Rotorcraft");
+					Properties.Settings.Default.Save();
 #if DEBUG
-						Log.LogMessage("AIMapping : Répertoire d'installation FSX STEAM trouvé :  = " + BaseInstallation[1], Color.DarkBlue, 1);
+					Log.LogMessage("AIMapping : Répertoire d'installation FSX STEAM trouvé :  = " + BaseInstallation[1], Color.DarkOliveGreen, 1);
 #endif
-					}
 				}
 			}
 			//Vérification installation de P3D
 			if (Properties.Settings.Default.AIScanFoldersP3DV2.Count < 1)
 			{
-				registryKey = Registry.LocalMachine.OpenSubKey(BaseRegistryPath + "Lockheed Martin\\Prepar3D v2");
-				if (registryKey != null)
-				{
-					Valeur = registryKey.GetValue("SetupPath");
-					if (Valeur == null) Valeur = registryKey.GetValue("AppPath");
-					if (Valeur != null)
-					{
-						BaseInstallation[2] = (string)Valeur;
-						if (!BaseInstallation[2].EndsWith("\\")) BaseInstallation[2] += "\\";
-						Properties.Settings.Default.AIScanFoldersP3DV2.Add(BaseInstallation[2] + "SimObjects\\Airplanes");
-						Properties.Settings.Default.AIScanFoldersP3DV2.Add(BaseInstallation[2] + "SimObjects\\Rotorcraft");
-						Properties.Settings.Default.Save();
+                BaseInstallation[2] = FindInstallationPath("Lockheed Martin\\Prepar3D v2");
+                if (BaseInstallation[2].Length > 0)
+                {
+					Properties.Settings.Default.AIScanFoldersP3DV2.Add(BaseInstallation[2] + "SimObjects\\Airplanes");
+					Properties.Settings.Default.AIScanFoldersP3DV2.Add(BaseInstallation[2] + "SimObjects\\Rotorcraft");
+					Properties.Settings.Default.Save();
 #if DEBUG
-						Log.LogMessage("AIMapping : Répertoire d'installation Prepar3D v2 trouvé :  = " + BaseInstallation[2], Color.DarkBlue, 1);
+					Log.LogMessage("AIMapping : Répertoire d'installation Prepar3D v2 trouvé :  = " + BaseInstallation[2], Color.DarkOliveGreen, 1);
 #endif
-					}
 				}
 			}
 			if (Properties.Settings.Default.AIScanFoldersP3DV3.Count < 1)
 			{
-				registryKey = Registry.LocalMachine.OpenSubKey(BaseRegistryPath + "Lockheed Martin\\Prepar3D v3");
-				if (registryKey != null)
-				{
-					Valeur = registryKey.GetValue("SetupPath");
-					if (Valeur == null) Valeur = registryKey.GetValue("AppPath");
-					if (Valeur != null)
-					{
-						BaseInstallation[3] = (string)Valeur;
-						if (!BaseInstallation[3].EndsWith("\\")) BaseInstallation[3] += "\\";
-						Properties.Settings.Default.AIScanFoldersP3DV3.Add(BaseInstallation[3] + "SimObjects\\Airplanes");
-						Properties.Settings.Default.AIScanFoldersP3DV3.Add(BaseInstallation[3] + "SimObjects\\Rotorcraft");
-						Properties.Settings.Default.Save();
+                BaseInstallation[3] = FindInstallationPath("Lockheed Martin\\Prepar3D v3");
+                if (BaseInstallation[3].Length > 0)
+                {
+                    Properties.Settings.Default.AIScanFoldersP3DV3.Add(BaseInstallation[3] + "SimObjects\\Airplanes");
+					Properties.Settings.Default.AIScanFoldersP3DV3.Add(BaseInstallation[3] + "SimObjects\\Rotorcraft");
+					Properties.Settings.Default.Save();
 #if DEBUG
-						Log.LogMessage("AIMapping : Répertoire d'installation Prepar3D v3 trouvé :  = " + BaseInstallation[3], Color.DarkBlue, 1);
+					Log.LogMessage("AIMapping : Répertoire d'installation Prepar3D v3 trouvé :  = " + BaseInstallation[3], Color.DarkOliveGreen, 1);
 #endif
-					}
 				}
 			}
             if (Properties.Settings.Default.AIScanFoldersP3DV4.Count < 1)
             {
-                registryKey = Registry.LocalMachine.OpenSubKey(BaseRegistryPath + "Lockheed Martin\\Prepar3D v4");
-                if (registryKey != null)
+                BaseInstallation[4] = FindInstallationPath("Lockheed Martin\\Prepar3D v4");
+                if (BaseInstallation[4].Length > 0)
                 {
-                    Valeur = registryKey.GetValue("SetupPath");
-                    if (Valeur == null) Valeur = registryKey.GetValue("AppPath");
-                    if (Valeur != null)
-                    {
-                        BaseInstallation[4] = (string)Valeur;
-                        if (!BaseInstallation[4].EndsWith("\\")) BaseInstallation[4] += "\\";
-                        Properties.Settings.Default.AIScanFoldersP3DV4.Add(BaseInstallation[4] + "SimObjects\\Airplanes");
-                        Properties.Settings.Default.AIScanFoldersP3DV4.Add(BaseInstallation[4] + "SimObjects\\Rotorcraft");
-                        Properties.Settings.Default.Save();
+                   Properties.Settings.Default.AIScanFoldersP3DV4.Add(BaseInstallation[4] + "SimObjects\\Airplanes");
+                   Properties.Settings.Default.AIScanFoldersP3DV4.Add(BaseInstallation[4] + "SimObjects\\Rotorcraft");
+                   Properties.Settings.Default.Save();
 #if DEBUG
-                        Log.LogMessage("AIMapping : Répertoire d'installation Prepar3D v4 trouvé :  = " + BaseInstallation[4], Color.DarkBlue, 1);
+                   Log.LogMessage("AIMapping : Répertoire d'installation Prepar3D v4 trouvé :  = " + BaseInstallation[4], Color.DarkOliveGreen, 1);
 #endif
-                    }
                 }
             }
         }

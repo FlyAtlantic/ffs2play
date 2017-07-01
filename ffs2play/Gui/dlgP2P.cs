@@ -81,7 +81,11 @@ namespace ffs2play
 					gbFSX.Text += "Prepar3D V3";
 					FolderList = Properties.Settings.Default.AIScanFoldersP3DV3;
 					break;
-			}
+                case SIM_VERSION.P3D_V4:
+                    gbFSX.Text += "Prepar3D V4";
+                    FolderList = Properties.Settings.Default.AIScanFoldersP3DV4;
+                    break;
+            }
 			if (FolderList != null)
 			{
 				foreach (string Path in FolderList)

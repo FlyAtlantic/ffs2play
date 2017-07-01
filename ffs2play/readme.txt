@@ -32,3 +32,5 @@ Notes de révision:
 1.0.3 : Support V4 de P3D
 
 1.0.4 : Résolution bugs divers météo
+
+1.0.5 : Bug Support P3D V4 dans boite de dialogue des chemins de recherche des AI + Amélioration de l'algoritme de recherche dans la base de registre
