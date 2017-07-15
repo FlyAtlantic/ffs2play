@@ -1,12 +1,39 @@
-﻿using System;
+﻿/****************************************************************************
+**
+** Copyright (C) 2017 FSFranceSimulateur team.
+** Contact: https://github.com/ffs2/ffs2play
+**
+** FFS2Play is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 3 of the License, or
+** (at your option) any later version.
+**
+** FFS2Play is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** The license is as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL3
+** included in the packaging of this software. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-3.0.html.
+****************************************************************************/
+
+/****************************************************************************
+ * Outils.cs is part of FF2Play project
+ *
+ * This class purpose a dialog interface to manage account profils
+ * to connect severals FFS2Play networks servers
+ * **************************************************************************/
+
+using System;
 using System.Text;
 using System.Security.Cryptography;
 using System.Web.Script.Serialization;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Diagnostics;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
 
 namespace ffs2play
 {
@@ -16,11 +43,10 @@ namespace ffs2play
 		public int Major;
 		public int Minor;
 		public int Build;
-
 	}
 	class Outils
 	{
-        static private DateTime Last_UTC_Now=DateTime.UtcNow;
+        /*static private DateTime Last_UTC_Now=DateTime.UtcNow;
         static private long LastTicks= Last_UTC_Now.Ticks;
         static public DateTime Now
         {
@@ -32,7 +58,7 @@ namespace ffs2play
                 }
                 return Last_UTC_Now;
             }
-        }
+        }*/
 		static public sVersion GetVersion()
 		{
 			sVersion resultat;
@@ -140,19 +166,6 @@ namespace ffs2play
 		{
 			return (rad / Math.PI * 180.0);
 		}
-
-        private static readonly DateTime UnixEpoch =
-            new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-
-        public static long UnixTimestampFromDateTime(DateTime date)
-        {
-            return (long)(date - UnixEpoch).TotalMilliseconds;
-        }
-
-        public static DateTime TimeFromUnixTimestamp(long millis)
-        {
-            return UnixEpoch.AddMilliseconds(millis);
-        }
 
 		static public string PhpSerialize(object contenu)
 		{

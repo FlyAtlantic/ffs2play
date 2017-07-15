@@ -21,68 +21,52 @@
 ****************************************************************************/
 
 /****************************************************************************
- * dlgResolAI.cs is part of FF2Play project
+ * DateTimeEx.cs is part of FF2Play project
  *
  * This class purpose a dialog interface to manage account profils
  * to connect severals FFS2Play networks servers
  * **************************************************************************/
 
-
 using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace ffs2play
 {
-	public partial class dlgResolAI : Form
-	{
-		private string m_ExistingRule;
-		private AIMapping m_Mapping;
-		private List<string> ListeLocal;
-		public dlgResolAI(string RemoteAI)
-		{
-			InitializeComponent();
-			tbRemoteAI.Text = RemoteAI;
-			m_Mapping = AIMapping.Instance;
-			ListeLocal = m_Mapping.GetAITitreDispo();
-			cbAIRemplacement.DataSource = ListeLocal;
-			m_ExistingRule = m_Mapping.GetRule(RemoteAI);
-			if (m_ExistingRule != "")
-			{
-				cbAIRemplacement.SelectedIndex= cbAIRemplacement.FindString(m_ExistingRule);
-				btnSupprimer.Visible = true;
-			}
-			else
-			{
-				btnSupprimer.Visible = false;
-			}
-		}
+    public class DateTimeEx
+    {
+        private static DateTime _startTime;
+        private static Stopwatch _stopWatch = null;
+        private static TimeSpan _maxIdle = TimeSpan.FromSeconds(60);
+        private static readonly DateTime UnixEpoch =
+            new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-		private void btnAnnuler_Click(object sender, EventArgs e)
-		{
-			Close();
-			DialogResult = DialogResult.Cancel;
-		}
+        public static DateTime UtcNow
+        {
+            get
+            {
+                if ((_stopWatch == null) ||
+                    (_startTime.Add(_maxIdle) < DateTime.UtcNow))
+                {
+                    Reset();
+                }
+                return _startTime.AddTicks(_stopWatch.Elapsed.Ticks);
+            }
+        }
 
-		private void btnOK_Click(object sender, EventArgs e)
-		{
-			if (m_ExistingRule != cbAIRemplacement.Text)
-			{
-				m_Mapping.AddRule(tbRemoteAI.Text, cbAIRemplacement.Text);
-				DialogResult = DialogResult.OK;
-			}
-			else DialogResult = DialogResult.Cancel;
-			Close();
-		}
+        private static void Reset()
+        {
+            _startTime = DateTime.UtcNow;
+            _stopWatch = Stopwatch.StartNew();
+        }
 
-		private void btnSupprimer_Click(object sender, EventArgs e)
-		{
-			if (m_ExistingRule != "")
-			{
-				m_Mapping.DelRule(tbRemoteAI.Text);
-				DialogResult = DialogResult.OK;
-			}
-			Close();
-		}
-	}
+        public static long UnixTimestampFromDateTime(DateTime date)
+        {
+            return (long)(date - UnixEpoch).TotalMilliseconds;
+        }
+
+        public static DateTime TimeFromUnixTimestamp(long millis)
+        {
+            return UnixEpoch.AddMilliseconds(millis);
+        }
+    }
 }

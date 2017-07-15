@@ -34,3 +34,7 @@ Notes de révision:
 1.0.4 : Résolution bugs divers météo
 
 1.0.5 : Bug Support P3D V4 dans boite de dialogue des chemins de recherche des AI + Amélioration de l'algoritme de recherche dans la base de registre
+
+1.0.6 : Optimisation du moteur de rendu des AI : Création d'un référentiel de temps plus précis, Prédicteur et Interpolateur en thread séparé.
+		Résolution du bug du correcteur d'altitude pour les avions posés au sol : Maintenant les avions au sol vu par un autre avec un terrain différent, vois l'avion correctement posés
+		

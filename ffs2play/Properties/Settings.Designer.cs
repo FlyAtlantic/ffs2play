@@ -109,7 +109,7 @@ namespace ffs2play.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("54856")]
+        [global::System.Configuration.DefaultSettingValueAttribute("54855")]
         public ushort P2PPort {
             get {
                 return ((ushort)(this["P2PPort"]));
@@ -314,6 +314,18 @@ namespace ffs2play.Properties {
             }
             set {
                 this["AIScanFoldersP3DV4"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Beta {
+            get {
+                return ((bool)(this["Beta"]));
+            }
+            set {
+                this["Beta"] = value;
             }
         }
     }

@@ -24,7 +24,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="P2PPort" Type="System.UInt16" Scope="User">
-      <Value Profile="(Default)">54856</Value>
+      <Value Profile="(Default)">54855</Value>
     </Setting>
     <Setting Name="MultiInstance" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
@@ -79,6 +79,9 @@
     <Setting Name="AIScanFoldersP3DV4" Type="System.Collections.Specialized.StringCollection" Scope="User">
       <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
 &lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" /&gt;</Value>
+    </Setting>
+    <Setting Name="Beta" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>

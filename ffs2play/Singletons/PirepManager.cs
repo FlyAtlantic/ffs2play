@@ -1,12 +1,38 @@
-﻿using System;
+﻿/****************************************************************************
+**
+** Copyright (C) 2017 FSFranceSimulateur team.
+** Contact: https://github.com/ffs2/ffs2play
+**
+** FFS2Play is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 3 of the License, or
+** (at your option) any later version.
+**
+** FFS2Play is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** The license is as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL3
+** included in the packaging of this software. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-3.0.html.
+****************************************************************************/
+
+/****************************************************************************
+ * PirepManager.cs is part of FF2Play project
+ *
+ * This class purpose a dialog interface to manage account profils
+ * to connect severals FFS2Play networks servers
+ * **************************************************************************/
+
+using System;
 using System.Windows.Forms;
 using System.Timers;
 using System.Xml;
 using System.Drawing;
 using ffs2play.Properties;
-using System.Collections.Generic;
-using ENG.WMOCodes.Decoders;
-using ENG.WMOCodes.Codes;
 
 namespace ffs2play
 {
@@ -95,7 +121,7 @@ namespace ffs2play
 			AutoExit = false;
 			m_SyncAIDone = false;
 			Log = Logger.Instance;
-			LastGoodUpdate = Outils.Now;
+			LastGoodUpdate = DateTimeEx.UtcNow;
             Mapping = AIMapping.Instance;
 			try
 			{
@@ -370,36 +396,13 @@ namespace ffs2play
 #endif
                 m_tbMetar.Invoke(new Action(() => { m_tbMetar.Text = sMetar; }));
                 SendMetar(sMetar);
+                break;
             }
             
         }
 
         public void SendMetar (string pMetar)
         {
-            Metar mtr = null;
-            MetarDecoder decoder = new MetarDecoder();
-            try
-            {
-                mtr = decoder.Decode("METAR " + pMetar);
-                m_rtbDecryptedMetar.Invoke(new Action(() =>
-                {
-                    ENG.WMOCodes.Formatters.ShortInfoFormatter.MetarFormatter formatter =
-                        new ENG.WMOCodes.Formatters.ShortInfoFormatter.MetarFormatter();
-                    m_rtbDecryptedMetar.Clear();
-                    m_rtbDecryptedMetar.Text = formatter.ToString(mtr);
-                    //m_rtbDecryptedMetar.AppendText(Environment.NewLine + "Sanity check error: " + Environment.NewLine);
-                }));
-            }
-            catch (Exception e)
-            {
-                Log.LogMessage("PManager Metar Exception : " + e.Message, Color.DarkViolet);
-            }
-            
-            /*List<string> er = new List<string>();
-            List<string> w = new List<string>();
-            mtr.SanityCheck(ref er, ref w);
-            er.ForEach(i => m_rtbDecryptedMetar.AppendText("Sanity check error: "+ i + Environment.NewLine));
-            w.ForEach(i => m_rtbDecryptedMetar.AppendText("Sanity check warning: " + i + Environment.NewLine));*/
             SCM.SendWeatherObservation(pMetar);
         }
 

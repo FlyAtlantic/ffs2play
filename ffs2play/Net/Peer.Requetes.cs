@@ -1,4 +1,33 @@
-﻿using System;
+﻿/****************************************************************************
+**
+** Copyright (C) 2017 FSFranceSimulateur team.
+** Contact: https://github.com/ffs2/ffs2play
+**
+** FFS2Play is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 3 of the License, or
+** (at your option) any later version.
+**
+** FFS2Play is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** The license is as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL3
+** included in the packaging of this software. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-3.0.html.
+****************************************************************************/
+
+/****************************************************************************
+ * Peer.Requetes.cs is part of FF2Play project
+ *
+ * This class purpose a dialog interface to manage account profils
+ * to connect severals FFS2Play networks servers
+ * **************************************************************************/
+
+using System;
 using System.IO;
 using System.Drawing;
 using System.Net;
@@ -40,7 +69,7 @@ namespace ffs2play
 
 		private void SendPing()
 		{
-			m_LastPing = Outils.Now;
+			m_LastPing = DateTimeEx.UtcNow;
 			MemoryStream Output = new MemoryStream();
 			BinaryWriter BOutput = new BinaryWriter(Output);
 			BOutput.Write((byte)Protocol.PING);
@@ -49,9 +78,12 @@ namespace ffs2play
 			if ((m_Counter > 2) && m_OnLine )
 			{
 #if DEBUG
-				Log.LogMessage("Peer [" + CallSign + "] Passage en état OffLine", Color.DarkBlue, 1);
+                if (m_Counter >2)
+				    Log.LogMessage("Peer [" + CallSign + "] Passage en état OffLine = Timeout", Color.DarkBlue, 1);
+                else
+                    Log.LogMessage("Peer [" + CallSign + "] Passage en état OffLine = Déconnexion", Color.DarkBlue, 1);
 #endif
-				m_OnLine = false;
+                m_OnLine = false;
 				m_Version = 0;
 				m_MiniPing = 1000;
 				P2P.UpdateListItem(CallSign);
@@ -64,7 +96,7 @@ namespace ffs2play
 			MemoryStream Output = new MemoryStream();
 			BinaryWriter BOutput = new BinaryWriter(Output);
 			BOutput.Write((byte)Protocol.PONG);
-			BOutput.Write(Outils.UnixTimestampFromDateTime(Time));
+			BOutput.Write(DateTimeEx.UnixTimestampFromDateTime(Time));
 			Send(ref Output);
 		}
 

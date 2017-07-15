@@ -58,28 +58,6 @@
     <StartupObject>ffs2play.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ENG.WMOCodes, Version=2.2.4521.24430, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Downloads\METAR_NET_2.2.4521.24430\ENG.WMOCodes.dll</HintPath>
-    </Reference>
-    <Reference Include="ENG.WMOCodes.Decoders, Version=2.2.4521.24434, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Downloads\METAR_NET_2.2.4521.24430\ENG.WMOCodes.Decoders.dll</HintPath>
-    </Reference>
-    <Reference Include="ENG.WMOCodes.Downloaders">
-      <HintPath>..\..\..\..\Downloads\METAR_NET_2.2.4521.24430\ENG.WMOCodes.Downloaders.dll</HintPath>
-    </Reference>
-    <Reference Include="ENG.WMOCodes.Formatters, Version=2.2.4521.24431, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Downloads\METAR_NET_2.2.4521.24430\ENG.WMOCodes.Formatters.dll</HintPath>
-    </Reference>
-    <Reference Include="ENG.WMOCodes.Formatters.InfoFormatter">
-      <HintPath>..\..\..\..\Downloads\METAR_NET_2.2.4521.24430\ENG.WMOCodes.Formatters.InfoFormatter.dll</HintPath>
-    </Reference>
-    <Reference Include="ENG.WMOCodes.Formatters.ShortInfo, Version=2.2.4521.24435, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Downloads\METAR_NET_2.2.4521.24430\ENG.WMOCodes.Formatters.ShortInfo.dll</HintPath>
-    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.dll</HintPath>
       <Private>True</Private>
@@ -87,13 +65,6 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.1.3\lib\net45\EntityFramework.SqlServer.dll</HintPath>
       <Private>True</Private>
-    </Reference>
-    <Reference Include="ESystem, Version=3.5.4456.18751, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Downloads\METAR_NET_2.2.4521.24430\ESystem.dll</HintPath>
-    </Reference>
-    <Reference Include="ESystem.Extensions">
-      <HintPath>..\..\..\..\Downloads\METAR_NET_2.2.4521.24430\Tutorial\bin\Debug\ESystem.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="LockheedMartin.Prepar3D.SimConnect">
       <HintPath>D:\Program Files\Lockheed Martin\Prepar3D v4 SDK 4.0.23.21468\lib\SimConnect\managed\LockheedMartin.Prepar3D.SimConnect.dll</HintPath>
@@ -290,6 +261,7 @@
     <Compile Include="Singletons\AnalyseurManager.cs" />
     <Compile Include="Singletons\P2PManager.cs" />
     <Compile Include="Utils\AEStoPHPCryptography.cs" />
+    <Compile Include="Utils\DateTimeEx.cs" />
     <Compile Include="Utils\IniFile.cs" />
     <Compile Include="Singletons\PirepManager.Utils.cs" />
     <Compile Include="Singletons\PirepManager.CallBacks.cs" />

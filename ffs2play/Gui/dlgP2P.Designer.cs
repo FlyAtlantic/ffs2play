@@ -60,6 +60,9 @@
             this.Emplacement = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.label9 = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.cbBeta = new System.Windows.Forms.CheckBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -71,6 +74,7 @@
             this.gbTunning.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numP2PTx)).BeginInit();
             this.gbFSX.SuspendLayout();
+            this.groupBox3.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -86,6 +90,7 @@
             this.tableLayoutPanel1.Controls.Add(this.gbTunning, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.gbFSX, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.label9, 1, 2);
+            this.tableLayoutPanel1.Controls.Add(this.groupBox3, 1, 3);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -476,6 +481,41 @@
             this.label9.Text = "Ajouter ici vos répertoires autres que ceux par défaut\r\ncontenant des AI reconnus" +
     " par votre simulateur.\r\nPar exemple la bibiothèque IVAO MTL";
             // 
+            // groupBox3
+            // 
+            this.groupBox3.BackColor = System.Drawing.Color.LightGray;
+            this.groupBox3.Controls.Add(this.cbBeta);
+            this.groupBox3.Controls.Add(this.label5);
+            this.groupBox3.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.groupBox3.ForeColor = System.Drawing.Color.Black;
+            this.groupBox3.Location = new System.Drawing.Point(303, 273);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(410, 84);
+            this.groupBox3.TabIndex = 7;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Testeur de version Bêta";
+            // 
+            // label5
+            // 
+            this.label5.Dock = System.Windows.Forms.DockStyle.Top;
+            this.label5.Location = new System.Drawing.Point(3, 16);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(404, 44);
+            this.label5.TabIndex = 2;
+            this.label5.Text = resources.GetString("label5.Text");
+            // 
+            // cbBeta
+            // 
+            this.cbBeta.AutoSize = true;
+            this.cbBeta.Location = new System.Drawing.Point(7, 61);
+            this.cbBeta.Name = "cbBeta";
+            this.cbBeta.Size = new System.Drawing.Size(378, 17);
+            this.cbBeta.TabIndex = 3;
+            this.cbBeta.Text = "Accepter les versions Bêta ( Opérationnel après redémarrage de FFS2Play)";
+            this.toolTip1.SetToolTip(this.cbBeta, resources.GetString("cbBeta.ToolTip"));
+            this.cbBeta.UseVisualStyleBackColor = true;
+            this.cbBeta.CheckedChanged += new System.EventHandler(this.cbBeta_CheckedChanged);
+            // 
             // dlgP2P
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -502,6 +542,8 @@
             this.gbTunning.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numP2PTx)).EndInit();
             this.gbFSX.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -538,5 +580,8 @@
 		private System.Windows.Forms.NumericUpDown numAILimite;
 		private System.Windows.Forms.Label label10;
 		private System.Windows.Forms.ToolTip toolTip1;
-	}
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.CheckBox cbBeta;
+        private System.Windows.Forms.Label label5;
+    }
 }

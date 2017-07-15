@@ -1,4 +1,33 @@
-﻿using System;
+﻿/****************************************************************************
+**
+** Copyright (C) 2017 FSFranceSimulateur team.
+** Contact: https://github.com/ffs2/ffs2play
+**
+** FFS2Play is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 3 of the License, or
+** (at your option) any later version.
+**
+** FFS2Play is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** The license is as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL3
+** included in the packaging of this software. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-3.0.html.
+****************************************************************************/
+
+/****************************************************************************
+ * SCManager.cs is part of FF2Play project
+ *
+ * This class purpose a dialog interface to manage account profils
+ * to connect severals FFS2Play networks servers
+ * **************************************************************************/
+
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
@@ -137,6 +166,7 @@ namespace ffs2play
 		SMOKE_ENABLE,
 		IS_SLEW_ACTIVE,
 		AI_MOVE,
+        AI_UPDATE,
 		AI_INIT
 	}
     /// <summary>
@@ -234,7 +264,20 @@ namespace ffs2play
 		public int Smoke;
 	}
 
-	public partial class SCManager : IDisposable
+    /// <summary>
+	/// Structure de mise à jour AI
+	/// la librairie simconnect
+	/// </summary>
+	[StructLayout(LayoutKind.Sequential, Pack = 1)]
+    public struct AIUpdateStruct
+    {
+        public double AvionAltitude;
+        public double SolAltitude;
+        public double Longitude;
+        public double Latitude;
+    }
+
+    public partial class SCManager : IDisposable
 	{
 		private TimeSpan m_VariableRate;
 		private DateTime m_LastVariable;
@@ -289,9 +332,9 @@ namespace ffs2play
 			m_scConnection = null;
 			m_SimStart = false;
 			m_VariableRate = TimeSpan.FromMilliseconds(100);
-			m_LastVariable = Outils.Now;
+			m_LastVariable = DateTimeEx.UtcNow;
 			//m_Thread.IsBackground = true;
-			AIProcess = new Dictionary<uint, string>();
+            AIProcess = new Dictionary<uint, string>();
 			Log = Logger.Instance;
 			m_MessageBuffer = new List<string>();
 			try
@@ -324,7 +367,7 @@ namespace ffs2play
 			internal static readonly SCManager instance = new SCManager();
 		}
 
-		public new void Dispose()
+		public void Dispose()
 		{
 			closeConnection();
 			GC.SuppressFinalize(this);
@@ -410,7 +453,8 @@ namespace ffs2play
 					initDataRequest();
 					// Démarrage du thread 
 					m_Thread = new Thread(MainThread);
-					m_Thread.Start();
+                    m_Thread.Priority = ThreadPriority.Highest;
+                    m_Thread.Start();
 				}
 				catch (COMException e)
 				{
@@ -581,14 +625,21 @@ namespace ffs2play
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.AI_MOVE, "LIGHT NAV", "Bool", SIMCONNECT_DATATYPE.INT32, 0.0f, SimConnect.SIMCONNECT_UNUSED);
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.AI_MOVE, "LIGHT RECOGNITION", "Bool", SIMCONNECT_DATATYPE.INT32, 0.0f, SimConnect.SIMCONNECT_UNUSED);
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.AI_MOVE, "SMOKE ENABLE", "Bool", SIMCONNECT_DATATYPE.INT32, 0.0f, SimConnect.SIMCONNECT_UNUSED);
-			
-
 
 			// On associe notre structure à la définition simconnect
 			m_scConnection.RegisterDataDefineStruct<AIMoveStruct>(DEFINITIONS_ID.AI_MOVE);
 
-			// Données sur changement
-			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.PARKING_BRAKE, "BRAKE PARKING INDICATOR", "Bool", SIMCONNECT_DATATYPE.INT32, 0.0f, SimConnect.SIMCONNECT_UNUSED);
+            // Données périodiques des AI
+            m_scConnection.AddToDataDefinition(DEFINITIONS_ID.AI_UPDATE, "PLANE ALTITUDE", "feet", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
+            m_scConnection.AddToDataDefinition(DEFINITIONS_ID.AI_UPDATE, "GROUND ALTITUDE", "feet", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
+            m_scConnection.AddToDataDefinition(DEFINITIONS_ID.AI_UPDATE, "Plane Longitude", "degrees", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
+            m_scConnection.AddToDataDefinition(DEFINITIONS_ID.AI_UPDATE, "Plane Latitude", "degrees", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
+
+            // On associe notre structure à la définition simconnect
+            m_scConnection.RegisterDataDefineStruct<AIUpdateStruct>(DEFINITIONS_ID.AI_UPDATE);
+
+            // Données sur changement
+            m_scConnection.AddToDataDefinition(DEFINITIONS_ID.PARKING_BRAKE, "BRAKE PARKING INDICATOR", "Bool", SIMCONNECT_DATATYPE.INT32, 0.0f, SimConnect.SIMCONNECT_UNUSED);
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.OVERSPEED, "OVERSPEED WARNING", "Bool", SIMCONNECT_DATATYPE.INT32, 0.0f, SimConnect.SIMCONNECT_UNUSED);
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.STALLING, "STALL WARNING", "Bool", SIMCONNECT_DATATYPE.INT32, 0.0f, SimConnect.SIMCONNECT_UNUSED);
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.CRASH, "CRASH SEQUENCE", "enum", SIMCONNECT_DATATYPE.INT32, 0.0f, SimConnect.SIMCONNECT_UNUSED);
@@ -723,14 +774,13 @@ namespace ffs2play
 				Log.LogMessage("SCManager: OnRecvAssignedObjectId Request = " + data.dwRequestID.ToString() + " , Name = " + Tail + " , Object_ID = " + data.dwObjectID.ToString(), Color.DarkViolet, 2);
 #endif
 				m_scConnection.AIReleaseControl(data.dwObjectID, REQUESTS_ID.AI_RELEASE);
-				m_scConnection.TransmitClientEvent(data.dwObjectID, EVENT_ID.FREEZE_LATLONG, 1, (GROUP_ID)SimConnect.SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG.GROUPID_IS_PRIORITY);
-				m_scConnection.TransmitClientEvent(data.dwObjectID, EVENT_ID.FREEZE_ALTITUDE, 1, (GROUP_ID)SimConnect.SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG.GROUPID_IS_PRIORITY);
-				m_scConnection.TransmitClientEvent(data.dwObjectID, EVENT_ID.FREEZE_ATTITUDE, 1, (GROUP_ID)SimConnect.SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG.GROUPID_IS_PRIORITY);
+                m_scConnection.TransmitClientEvent(data.dwObjectID, EVENT_ID.FREEZE_ATTITUDE, 1, (GROUP_ID)SimConnect.SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG.GROUPID_IS_PRIORITY);
+                m_scConnection.TransmitClientEvent(data.dwObjectID, EVENT_ID.FREEZE_LATLONG, 1, (GROUP_ID)SimConnect.SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG.GROUPID_IS_PRIORITY);
+                m_scConnection.TransmitClientEvent(data.dwObjectID, EVENT_ID.FREEZE_ALTITUDE, 1, (GROUP_ID)SimConnect.SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG.GROUPID_IS_PRIORITY);
 
-				FireSCAICreated(new SCManagerEventAICreated(Tail, data.dwObjectID));
+                FireSCAICreated(new SCManagerEventAICreated(Tail, data.dwObjectID));
 				AIProcess.Remove(data.dwRequestID);
-				//if (GetVersion() < SIM_VERSION.P3D_V2)
-					m_scConnection.RequestDataOnSimObject((REQUESTS_ID)((uint)REQUESTS_ID.AI_UPDATE + data.dwObjectID), DEFINITIONS_ID.AI_MOVE, data.dwObjectID, SIMCONNECT_PERIOD.SECOND, SIMCONNECT_DATA_REQUEST_FLAG.DEFAULT, 0, 0, 0);
+                m_scConnection.RequestDataOnSimObject((REQUESTS_ID)((uint)REQUESTS_ID.AI_UPDATE + data.dwObjectID), DEFINITIONS_ID.AI_UPDATE, data.dwObjectID, SIMCONNECT_PERIOD.SIM_FRAME, SIMCONNECT_DATA_REQUEST_FLAG.DEFAULT, 0, 0, 0);
 
 			}
 			else
@@ -773,7 +823,7 @@ namespace ffs2play
 			switch ((REQUESTS_ID)data.dwRequestID)
 			{
 				case REQUESTS_ID.PERIODIQUE:
-                    m_LastSim = Outils.Now;
+                    m_LastSim = DateTimeEx.UtcNow;
                     m_SimRate = m_LastSim - m_LastSim;
 					if (m_LastSim >= (m_LastVariable+m_VariableRate))
 					{
@@ -784,7 +834,7 @@ namespace ffs2play
 				default:
 
 					if  ((REQUESTS_ID)data.dwRequestID >= REQUESTS_ID.AI_UPDATE)
-						FireSCReceiveAIUpdate(new SCManagerEventAIUpdate((AIMoveStruct)data.dwData[0], data.dwObjectID));
+						FireSCReceiveAIUpdate(new SCManagerEventAIUpdate((AIUpdateStruct)data.dwData[0], data.dwObjectID));
 					else FireSCReceiveEvent(new SCManagerEventSCEvent((EVENT_ID)data.dwRequestID, (uint)data.dwData[0]));
 					break;
 			}
@@ -939,14 +989,31 @@ namespace ffs2play
 			return false;
 		}
 
-		/// <summary>
-		/// Envoi d'un event vers un AI
-		/// </summary>
-		/// <param name="Object_ID"></param>
-		/// <param name="evt"></param>
-		/// <param name="Data"></param>
-		/// <returns></returns>
-		public bool EventToAI(uint Object_ID, EVENT_ID evt, uint Data)
+        public void Freeze_AI(uint Object_ID,bool State)
+        {
+            if (m_bConnected && (Object_ID > 0))
+            {
+                if (State)
+                {
+                    m_scConnection.TransmitClientEvent(Object_ID, EVENT_ID.FREEZE_LATLONG, 1, (GROUP_ID)SimConnect.SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG.GROUPID_IS_PRIORITY);
+                    m_scConnection.TransmitClientEvent(Object_ID, EVENT_ID.FREEZE_ALTITUDE, 1, (GROUP_ID)SimConnect.SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG.GROUPID_IS_PRIORITY);
+                }
+                else
+                {
+                    m_scConnection.TransmitClientEvent(Object_ID, EVENT_ID.FREEZE_LATLONG, 0, (GROUP_ID)SimConnect.SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG.GROUPID_IS_PRIORITY);
+                    m_scConnection.TransmitClientEvent(Object_ID, EVENT_ID.FREEZE_ALTITUDE, 0, (GROUP_ID)SimConnect.SIMCONNECT_GROUP_PRIORITY_HIGHEST, SIMCONNECT_EVENT_FLAG.GROUPID_IS_PRIORITY);
+
+                }
+            }
+        }
+        /// <summary>
+        /// Envoi d'un event vers un AI
+        /// </summary>
+        /// <param name="Object_ID"></param>
+        /// <param name="evt"></param>
+        /// <param name="Data"></param>
+        /// <returns></returns>
+        public bool EventToAI(uint Object_ID, EVENT_ID evt, uint Data)
 		{
 			if (m_bConnected)
 			{
@@ -990,8 +1057,8 @@ namespace ffs2play
                 {
                     m_Last_Metar = Metar;
                     m_scConnection.WeatherSetModeCustom();
-                    //m_scConnection.WeatherSetModeGlobal();
-                    //Metar = Metar.Replace(Metar.Substring(0, 4), "GLOB");
+                    m_scConnection.WeatherSetModeGlobal();
+                    Metar = Metar.Replace(Metar.Substring(0, 4), "GLOB");
                     //Nettoyage du metar
                     if (Metar.Contains("AUTO")) Metar = Metar.Replace("AUTO", "");
                     if (Metar.Contains("NOSIG")) Metar = Metar.Replace("NOSIG", "");
@@ -1079,7 +1146,7 @@ namespace ffs2play
 		{
 			FrameRate = pFrameRate;
 			SimSpeed = pSimSpeed;
-			Time = Outils.Now;
+			Time = DateTimeEx.UtcNow;
 		}
 		public float FrameRate;
 		public float SimSpeed;
@@ -1112,43 +1179,51 @@ namespace ffs2play
     {
 		public SCManagerEventSCEvent()
 		{
-			Time = Outils.Now;
+			Time = DateTimeEx.UtcNow;
 		}
 		public SCManagerEventSCEvent (EVENT_ID pEvt_ID, uint pData)
 		{
 			Evt_Id = pEvt_ID;
 			Data = (int)pData;
-			Time = Outils.Now;
+			Time = DateTimeEx.UtcNow;
 		}
 		public EVENT_ID Evt_Id;
 		public int Data;
 		public DateTime Time;
 	}
 
+    /// <summary>
+    /// Classe contenaire des données sur un update de l'avion
+    /// </summary>
+
     public class SCManagerEventSCVariable : EventArgs
     {
 		public SCManagerEventSCVariable (DonneesAvion pData)
 		{
 			Data = pData;
-			Time = Outils.Now;
+			Time = DateTimeEx.UtcNow;
 		}
 		public DonneesAvion Data;
 		public DateTime Time;
     }
 
+    /// <summary>
+    /// Classe contenaire des donnée sur un update d'AI
+    /// </summary>
+
 	public class SCManagerEventAIUpdate : EventArgs
 	{
 		public SCManagerEventAIUpdate()
 		{
-			Time = Outils.Now;
+			Time = DateTimeEx.UtcNow;
 		}
-		public SCManagerEventAIUpdate(AIMoveStruct pData, uint pObjectID)
+		public SCManagerEventAIUpdate(AIUpdateStruct pData, uint pObjectID)
 		{
 			Data = pData;
 			ObjectID = pObjectID;
-			Time = Outils.Now;
+			Time = DateTimeEx.UtcNow;
 		}
-		public AIMoveStruct Data;
+		public AIUpdateStruct Data;
 		public uint ObjectID;
 		public DateTime Time;
 	}

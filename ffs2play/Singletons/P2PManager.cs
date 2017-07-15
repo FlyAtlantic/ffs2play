@@ -1,4 +1,33 @@
-﻿using System;
+﻿/****************************************************************************
+**
+** Copyright (C) 2017 FSFranceSimulateur team.
+** Contact: https://github.com/ffs2/ffs2play
+**
+** FFS2Play is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 3 of the License, or
+** (at your option) any later version.
+**
+** FFS2Play is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** The license is as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL3
+** included in the packaging of this software. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-3.0.html.
+****************************************************************************/
+
+/****************************************************************************
+ * P2PManager.cs is part of FF2Play project
+ *
+ * This class purpose a dialog interface to manage account profils
+ * to connect severals FFS2Play networks servers
+ * **************************************************************************/
+
+using System;
 using System.Drawing;
 using System.Net;
 using System.Collections.Generic;
@@ -239,7 +268,13 @@ namespace ffs2play
 							MenuItem ResolMenuItem = new MenuItem("Remplacement AI");
 							ResolMenuItem.Click += ResolMenuItem_Click;
 							contextMenu.MenuItems.Add(ResolMenuItem);
-						}
+#if DEBUG
+                            MenuItem BlockDataItem = new MenuItem("Bloquer les données");
+                            BlockDataItem.Click += BlockDataItem_Click;
+                            if (Pair.BlockData) BlockDataItem.Checked = true;
+                            contextMenu.MenuItems.Add(BlockDataItem);
+#endif
+                        }
 						MenuItem UserMenuItem = new MenuItem("Masquer");
 						if (Properties.Settings.Default.P2PBlackList.Contains(m_Item.Text)) UserMenuItem.Checked = true;
 						UserMenuItem.Click += UserMenuItem_Click;
@@ -249,13 +284,21 @@ namespace ffs2play
 				}
 			}
 		}
+#if DEBUG
+        private void BlockDataItem_Click(Object sender, EventArgs e)
+        {
+            Peer Pair = Peers.Find(x => x.CallSign == m_Item.Text);
+            Pair.BlockData = !((MenuItem)sender).Checked;
+            ((MenuItem)sender).Checked = Pair.BlockData;
+        }
+#endif
 
-		/// <summary>
-		/// Ouvre la boite de dialogue de remplacement d'AI
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void ResolMenuItem_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Ouvre la boite de dialogue de remplacement d'AI
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ResolMenuItem_Click(object sender, EventArgs e)
 		{
 			Peer Pair = Peers.Find(x => x.CallSign == m_Item.Text);
 			dlgResolAI ResolAI = new dlgResolAI(Pair.Titre);
@@ -820,9 +863,6 @@ namespace ffs2play
 							break;
 						case "Object_ID":
 							Sub.Text = Pair.ObjectId.ToString();
-							break;
-						case "Frame Count":
-							Sub.Text = Pair.FrameCount.ToString();
 							break;
 						case "Ecart":
 							Sub.Text = string.Format("{0:0.0} Nm", Pair.Ecart);

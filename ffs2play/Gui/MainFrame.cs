@@ -1,4 +1,33 @@
-﻿using System;
+﻿/****************************************************************************
+**
+** Copyright (C) 2017 FSFranceSimulateur team.
+** Contact: https://github.com/ffs2/ffs2play
+**
+** FFS2Play is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 3 of the License, or
+** (at your option) any later version.
+**
+** FFS2Play is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** The license is as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL3
+** included in the packaging of this software. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-3.0.html.
+****************************************************************************/
+
+/****************************************************************************
+ * MainFrame.cs is part of FF2Play project
+ *
+ * This class purpose a dialog interface to manage account profils
+ * to connect severals FFS2Play networks servers
+ * **************************************************************************/
+
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Configuration;
@@ -168,13 +197,20 @@ namespace ffs2play
 			string[] arguments = Environment.GetCommandLineArgs();
 			scm.openConnection();
 
-			//Vérification de la version
+            //Vérification de la version
+            string CheckVersionURL;
 #if P3D
-			HTTPRequestThread CheckVersion = new HTTPRequestThread("http://download.ffsimulateur2.fr/ffs2playp3d.php",CheckVersionCallBack);
+            CheckVersionURL = "http://download.ffsimulateur2.fr/ffs2playp3d.php";
 #else
-			HTTPRequestThread CheckVersion = new HTTPRequestThread("http://download.ffsimulateur2.fr/ffs2play.php",CheckVersionCallBack);
+            CheckVersionURL = "http://download.ffsimulateur2.fr/ffs2play.php";
 #endif
-			CheckVersion.Start();
+            if (Properties.Settings.Default.Beta)
+            {
+                CheckVersionURL += "?beta";
+            }
+            HTTPRequestThread CheckVersion = new HTTPRequestThread(CheckVersionURL, CheckVersionCallBack);
+
+            CheckVersion.Start();
 			if (!Properties.Settings.Default.LogVisible)
 			{
 				scMainWindow.Panel2Collapsed = true;
@@ -193,18 +229,20 @@ namespace ffs2play
 				int SiteMajor = Convert.ToInt32(Version.Attributes["major"].Value);
 				int SiteMinor = Convert.ToInt32(Version.Attributes["minor"].Value);
 				int SiteBuild = Convert.ToInt32(Version.Attributes["build"].Value);
+                Byte Beta = Convert.ToByte(Version.Attributes["beta"].Value);
 				bool maj = false;
 				bool compat = true;
 				string Message = "";
+                if (Beta==1) Message = "!!! Attention, Nouvelle Version Bêta disponible !!!"+ Environment.NewLine+ Environment.NewLine;
 				if (SiteMajor > Actual.Major)
 				{
-					Message = "Cette version de FFS2Play n'est pas supportée par le site. souhaitez vous procéder à la mise à jour ?";
+					Message += "Cette version de FFS2Play n'est pas supportée par le site. souhaitez vous procéder à la mise à jour ?";
 					maj = true;
 					compat = false;
 				}
 				else if ((SiteMinor > Actual.Minor) || ((SiteMinor == Actual.Minor) && (SiteBuild > Actual.Build)))
 				{
-					Message = "Cette version de FFS2Play n'est plus a jour. souhaitez vous procéder à la mise à jour ?";
+					Message += "Cette version de FFS2Play n'est plus a jour. souhaitez vous procéder à la mise à jour ?";
 					maj = true;
 				}
 

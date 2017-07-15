@@ -1,4 +1,33 @@
-﻿using Microsoft.Win32.SafeHandles;
+﻿/****************************************************************************
+**
+** Copyright (C) 2017 FSFranceSimulateur team.
+** Contact: https://github.com/ffs2/ffs2play
+**
+** FFS2Play is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 3 of the License, or
+** (at your option) any later version.
+**
+** FFS2Play is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** The license is as published by the Free Software
+** Foundation and appearing in the file LICENSE.GPL3
+** included in the packaging of this software. Please review the following
+** information to ensure the GNU General Public License requirements will
+** be met: https://www.gnu.org/licenses/gpl-3.0.html.
+****************************************************************************/
+
+/****************************************************************************
+ * Peer.cs is part of FF2Play project
+ *
+ * This class purpose a dialog interface to manage account profils
+ * to connect severals FFS2Play networks servers
+ * **************************************************************************/
+
+using Microsoft.Win32.SafeHandles;
 using System;
 using System.Drawing;
 using System.Net;
@@ -57,6 +86,7 @@ namespace ffs2play
 		private AirData m_FuturData;
 		private AirData m_ActualPos;
 		private AIMoveStruct m_AIData;
+        private AIUpdateStruct m_AISimData;
 		private DateTime m_LastPing;
 		private DateTime m_LastData;
 		private uint m_SendInterval;
@@ -73,7 +103,6 @@ namespace ffs2play
 		private uint m_ObjectID;
 		private byte m_Version;
 		private int m_Spawned;
-		private bool m_Refresh;
 		private AnalyseurManager m_Analyseur;
 		public const byte PROTO_VERSION = 13;
 		private double m_PredictiveTime;
@@ -81,7 +110,6 @@ namespace ffs2play
 		//Synchronisation des demandes de AI
 		private System.Timers.Timer m_TimerCreateAI;
 		private AIResol m_AIResolution;
-		private int m_FrameCount;
 		private double m_Ecart;
 		private DateTime m_LastAIUpdate;
 		private bool m_bDisabled;
@@ -99,10 +127,10 @@ namespace ffs2play
 		private double m_DeltaBank;
 		public bool Visible;
 		private bool m_bSpawnable;
-#if DEBUG
-        private string Trace;
-#endif
+        private bool m_bBlockData;
         private double m_old_fps;
+        private double m_old_GND_AI;
+        private double m_old_ALT_AI;
 
 		/// <summary>
 		/// Constructeur d'un Pair P2P
@@ -138,7 +166,14 @@ namespace ffs2play
 			Disabled = pDisabled;
 			Visible = false;
 			m_bSpawnable = false;
-		}
+            m_bBlockData = false;
+        }
+
+        public bool BlockData
+        {
+            get { return m_bBlockData; }
+            set { m_bBlockData = value; }
+        }
 
 		public AIResol AIResolution
 		{
@@ -186,7 +221,7 @@ namespace ffs2play
 			HeartBeat.Start();
 			m_TimerCreateAI = new System.Timers.Timer(5000);
 			m_TimerCreateAI.Elapsed += OnTimerCreateAI;
-			m_LastData = Outils.Now;
+			m_LastData = DateTimeEx.UtcNow;
 			m_LastStateEvent = m_LastData;
 			m_Counter = 0;
 			m_Counter_In = 0;
@@ -194,14 +229,13 @@ namespace ffs2play
 			m_Distance = -1;
 			m_OnLine = false;
 			m_SendInterval = 5000;
-			m_FrameCount = 0;
 			m_Ecart = 0;
 			m_ObjectID = 0;
 			m_Version = 0;
 			m_Spawned = 0;
-			m_Refresh = false;
+			//m_Refresh = false;
 			m_MiniPing = 1000;
-			m_PredictiveTime = 1000;
+			//m_PredictiveTime = 1000;
 			if (Properties.Settings.Default.P2PInfoEnable)
 				m_SC.SendScrollingText(CallSign + " est connecté au réseau P2P");
 			m_bDisabled = false;
@@ -394,12 +428,6 @@ namespace ffs2play
 			get { return m_Data.RudderPos; }
 		}
 
-
-		public int FrameCount
-		{
-			get { return m_FrameCount; }
-		}
-
 		public double Ecart
 		{
 			get { return m_Ecart; }
@@ -479,13 +507,96 @@ namespace ffs2play
 				m_Spawned = 3;
 			}
 		}
+
+        /// <summary>
+        /// Recalcul le prédicteur lors de la réception de nouvelles données
+        /// </summary>
+
+        private void RefreshData()
+        {
+            //DateTime Maintenant = DateTime.UtcNow;
+            if ((m_ObjectID == 0) || (m_Version != PROTO_VERSION)) return;
+            //Si c'est le premier positionnement, on initialise les données avec la position brute
+            if (m_Spawned == 5)
+            {
+                m_AIData.Altitude = m_Data.Altitude;
+                m_AIData.Latitude = m_Data.Latitude;
+                m_AIData.Longitude = m_Data.Longitude;
+                m_AIData.Heading = m_Data.Heading;
+                m_AIData.Pitch = m_Data.Pitch;
+                m_AIData.Bank = m_Data.Bank;
+                m_SC.Freeze_AI(m_ObjectID, m_Data.OnGround);
+                if (m_Spawned == 5) m_Spawned = 6;
+            }
+            //Nous avons des données toutes fraiches et nous sommes prêt à calculer l'extrapolation
+            if (m_Spawned >= 6)
+            {
+                double CoefHoriz = 0;
+                m_PredictiveTime = m_RemoteRefreshRate.TotalMilliseconds*3;
+                //Calcul de l'extrapolation
+                double Retard = (m_LastData - m_Data.TimeStamp).TotalMilliseconds; //Calcul du retard absolu de la donnée
+                if (Retard < 0) Retard = 0;
+                //double Periode = m_RemoteRefreshRate.TotalMilliseconds; //Calcul de la période entre deux données
+                if (m_RemoteRefreshRate.TotalMilliseconds > 0)
+                {
+                    // On mémorise la position actuelle de l'extrapolation
+                    m_ActualPos.TimeStamp = m_LastRender;
+                    m_ActualPos.Altitude = m_AIData.Altitude;
+                    m_ActualPos.Latitude = m_AIData.Latitude;
+                    m_ActualPos.Longitude = m_AIData.Longitude;
+                    m_ActualPos.Heading = m_AIData.Heading;
+                    m_ActualPos.Bank = m_AIData.Bank;
+                    m_ActualPos.Pitch = m_AIData.Pitch;
+
+                    m_FuturData.TimeStamp = m_LastRender + TimeSpan.FromMilliseconds(m_PredictiveTime);
+                    CoefHoriz = (m_FuturData.TimeStamp - m_Data.TimeStamp).TotalMilliseconds / m_RemoteRefreshRate.TotalMilliseconds;
+                    m_FuturData.Altitude = m_Data.Altitude + ((m_Data.Altitude - m_OldData.Altitude) * CoefHoriz);
+                    m_FuturData.Longitude = m_Data.Longitude + ((m_Data.Longitude - m_OldData.Longitude) * CoefHoriz);
+                    m_FuturData.Latitude = m_Data.Latitude + ((m_Data.Latitude - m_OldData.Latitude) * CoefHoriz);
+                    double Gam_Heading = m_Data.Heading - m_OldData.Heading;
+                    if (Gam_Heading < -180) Gam_Heading += 360;
+                    if (Gam_Heading > 180) Gam_Heading -= 360;
+                    m_FuturData.Heading = m_Data.Heading + (Gam_Heading * CoefHoriz);
+                    if (m_FuturData.Heading < 0) m_FuturData.Heading += 360;
+                    if (m_FuturData.Heading >= 360) m_FuturData.Heading -= 360;
+                    double Gam_Pitch = m_Data.Pitch - m_OldData.Pitch;
+                    if (Gam_Pitch < -180) Gam_Pitch += 360;
+                    if (Gam_Pitch > 180) Gam_Pitch -= 360;
+                    m_FuturData.Pitch = m_Data.Pitch + (Gam_Pitch * CoefHoriz);
+                    if (m_FuturData.Pitch < -180) m_FuturData.Pitch += 360;
+                    if (m_FuturData.Pitch >= 180) m_FuturData.Pitch -= 360;
+                    double Gam_Bank = m_Data.Bank - m_OldData.Bank;
+                    if (Gam_Bank < -180) Gam_Bank += 360;
+                    if (Gam_Bank > 180) Gam_Bank -= 360;
+                    m_FuturData.Bank = m_Data.Bank + (Gam_Bank * CoefHoriz);
+                    if (m_FuturData.Bank < -180) m_FuturData.Bank += 360;
+                    if (m_FuturData.Bank >= 180) m_FuturData.Bank -= 360;
+                    //Calcul des deltas de correction
+                    m_DeltaAltitude = m_FuturData.Altitude - m_ActualPos.Altitude;
+                    m_DeltaLatitude = m_FuturData.Latitude - m_ActualPos.Latitude;
+                    m_DeltaLongitude = m_FuturData.Longitude - m_ActualPos.Longitude;
+                    m_DeltaHeading = m_FuturData.Heading - m_ActualPos.Heading;
+                    if (m_DeltaHeading < -180) m_DeltaHeading += 360;
+                    if (m_DeltaHeading >= 180) m_DeltaHeading -= 360;
+                    m_DeltaPitch = m_FuturData.Pitch - m_ActualPos.Pitch;
+                    if (m_DeltaPitch < -180) m_DeltaPitch += 360;
+                    if (m_DeltaPitch >= 180) m_DeltaPitch -= 360;
+                    m_DeltaBank = m_FuturData.Bank - m_ActualPos.Bank;
+                    if (m_DeltaBank < -180) m_DeltaBank += 360;
+                    if (m_DeltaBank >= 180) m_DeltaBank -= 360;
+                }
+                m_Spawned = 7;
+                m_ActualPos.Pitch = m_AIData.Pitch;
+                if (m_Data.OnGround != m_OldData.OnGround) m_SC.Freeze_AI(m_ObjectID,m_Data.OnGround);
+            }
+        }
 		/// <summary>
 		/// Mise à jour de la position et de l'atitude de l'AI
 		/// </summary>
 		/// <param name="FrameRate"></param>
 		private void Update_AI(DateTime Time, float FPS)
 		{
-			m_Mutex.WaitOne();
+            m_Mutex.WaitOne();
 			try
 			{
 				//DateTime Maintenant = DateTime.UtcNow;
@@ -518,23 +629,16 @@ namespace ffs2play
 					m_AIData.NavLight = Convert.ToInt32(m_Data.NavLight);
 					m_AIData.RecoLight = Convert.ToInt32(m_Data.RecoLight);
 					m_AIData.Smoke = Convert.ToInt32(m_Data.Smoke);
-#if DEBUG
-					Trace += "|" + Time.Millisecond.ToString();
-#endif
 					//Si on a suffisement de donnée (new + old) on utilise l'interpolation
 					if (m_Spawned >= 7)
 					{
-						if (m_old_fps !=0)
-						{
-							FPS = (FPS + (float)m_old_fps) / 2;
-						}
-						m_old_fps = FPS;
-						double TempsFPS = 1000 / FPS;
-						//double TempsMes = (Time - m_LastRender).TotalMilliseconds;
-						double CoefInterpol = TempsFPS / (m_FuturData.TimeStamp - m_ActualPos.TimeStamp).TotalMilliseconds;
-#if DEBUG
-						Trace += " : " + string.Format("{0:0.000}", CoefInterpol);
-#endif
+                        if (m_old_fps != 0)
+                        {
+                            FPS = (FPS + (float)m_old_fps) / 2;
+                        }
+                        m_old_fps = FPS;
+                        double Temps = 1000 / FPS;
+                        double CoefInterpol = Temps / (m_FuturData.TimeStamp - m_ActualPos.TimeStamp).TotalMilliseconds;
 						m_LastRender = Time;
 						m_AIData.Altitude += m_DeltaAltitude * CoefInterpol;
 						m_AIData.Latitude += m_DeltaLatitude * CoefInterpol;
@@ -549,123 +653,40 @@ namespace ffs2play
 						if (m_AIData.Bank < -180) m_AIData.Bank += 360;
 						if (m_AIData.Bank >= 180) m_AIData.Bank -= 360;
 					}
-
-					//Nous avons des données toutes fraiches et nous sommes prêt à calculer l'extrapolation
-					if (m_Refresh && (m_Spawned >= 6))
-					{
-						double CoefHoriz = 0;
-						m_PredictiveTime = m_RemoteRefreshRate.TotalMilliseconds * 5;
-						//Calcul de l'extrapolation
-						double Retard = (m_LastData - m_Data.TimeStamp).TotalMilliseconds; //Calcul du retard absolu de la donnée
-						if (Retard < 0) Retard = 0;
-						double Periode = m_RemoteRefreshRate.TotalMilliseconds; //Calcul de la période entre deux données
-						if (Periode > 0)
-						{
-							// On mémorise la position actuelle de l'extrapolation
-							m_ActualPos.TimeStamp = Time;
-							m_ActualPos.Altitude = m_AIData.Altitude;
-							m_ActualPos.Latitude = m_AIData.Latitude;
-							m_ActualPos.Longitude = m_AIData.Longitude;
-							m_ActualPos.Heading = m_AIData.Heading;
-							m_ActualPos.Bank = m_AIData.Bank;
-
-							m_FuturData.TimeStamp = Time + TimeSpan.FromMilliseconds(m_PredictiveTime);
-							CoefHoriz = (m_FuturData.TimeStamp - m_Data.TimeStamp).TotalMilliseconds / Periode;
-							m_FuturData.Altitude = m_Data.Altitude + ((m_Data.Altitude - m_OldData.Altitude) * CoefHoriz);
-							m_FuturData.Longitude = m_Data.Longitude + ((m_Data.Longitude - m_OldData.Longitude) * CoefHoriz);
-							m_FuturData.Latitude = m_Data.Latitude + ((m_Data.Latitude - m_OldData.Latitude) * CoefHoriz);
-							double Gam_Heading = m_Data.Heading - m_OldData.Heading;
-							if (Gam_Heading < -180) Gam_Heading += 360;
-							if (Gam_Heading > 180) Gam_Heading -= 360;
-							m_FuturData.Heading = m_Data.Heading + (Gam_Heading * CoefHoriz);
-							if (m_FuturData.Heading < 0) m_FuturData.Heading += 360;
-							if (m_FuturData.Heading >= 360) m_FuturData.Heading -= 360;
-							double Gam_Pitch = m_Data.Pitch - m_OldData.Pitch;
-							if (Gam_Pitch < -180) Gam_Pitch += 360;
-							if (Gam_Pitch > 180) Gam_Pitch -= 360;
-							m_FuturData.Pitch = m_Data.Pitch + (Gam_Pitch * CoefHoriz);
-							if (m_FuturData.Pitch < -180) m_FuturData.Pitch += 360;
-							if (m_FuturData.Pitch >= 180) m_FuturData.Pitch -= 360;
-							double Gam_Bank = m_Data.Bank - m_OldData.Bank;
-							if (Gam_Bank < -180) Gam_Bank += 360;
-							if (Gam_Bank > 180) Gam_Bank -= 360;
-							m_FuturData.Bank = m_Data.Bank + (Gam_Bank * CoefHoriz);
-							if (m_FuturData.Bank < -180) m_FuturData.Bank += 360;
-							if (m_FuturData.Bank >= 180) m_FuturData.Bank -= 360;
-							//Calcul des deltas de correction
-							m_DeltaAltitude = m_FuturData.Altitude - m_ActualPos.Altitude;
-							m_DeltaLatitude = m_FuturData.Latitude - m_ActualPos.Latitude;
-							m_DeltaLongitude = m_FuturData.Longitude - m_ActualPos.Longitude;
-							m_DeltaHeading = m_FuturData.Heading - m_ActualPos.Heading;
-							if (m_DeltaHeading < -180) m_DeltaHeading += 360;
-							if (m_DeltaHeading >= 180) m_DeltaHeading -= 360;
-							m_DeltaPitch = m_FuturData.Pitch - m_ActualPos.Pitch;
-							if (m_DeltaPitch < -180) m_DeltaPitch += 360;
-							if (m_DeltaPitch >= 180) m_DeltaPitch -= 360;
-							m_DeltaBank = m_FuturData.Bank - m_ActualPos.Bank;
-							if (m_DeltaBank < -180) m_DeltaBank += 360;
-							if (m_DeltaBank >= 180) m_DeltaBank -= 360;
-						}
-						m_Refresh = false;
-						m_Spawned = 7;
-						m_ActualPos.Pitch = m_AIData.Pitch;
+                    if (m_Data.OnGround)
+                    {
+                        if ((m_AIData.Altitude > 10) && (m_AISimData.SolAltitude!=0))
+					    {
+                            // Mise à jour de l'altitude sol de référence
+                            if ((m_old_GND_AI == 0) || (m_old_GND_AI != m_AISimData.SolAltitude))
+                            {
+                                m_old_GND_AI = m_AISimData.SolAltitude;
+                                m_AIData.Altitude = m_AISimData.SolAltitude + m_AIResolution.CG_Height;
+                                if (m_AIResolution.Pitch > 0)
+                                {
+                                    m_AIData.Pitch = m_ActualPos.Pitch - m_AIResolution.Pitch;
+                                }
+                            }
+                        }
+                    }
+                    if (m_Spawned >= 7) m_SC.Update_AI(m_ObjectID, DEFINITIONS_ID.AI_MOVE, m_AIData);
+                }
+            }
+            catch (Exception e)
+            {
 #if DEBUG
-						if (m_bSelected)
-						{
-							Log.LogMessage("Peer [" + m_CallSign + "] Interpolation : " + Trace, Color.DarkBlue, 2);
-							Trace="";
-							Log.LogMessage("Peer [" + m_CallSign + "] DeltaTime = " + Periode.ToString() +
-							" Coef Horiz = " + CoefHoriz.ToString() +
-							" Predictive = " + m_PredictiveTime.ToString() +
-							" Décalage = " + m_Decalage.TotalMilliseconds.ToString() +
-							" Remote Refresh rate = " + m_RemoteRefreshRate.TotalMilliseconds.ToString() +
-							" Retard = " + Retard.ToString() +
-							" DeltaLat = " + (m_Data.Latitude - m_OldData.Latitude).ToString() +
-							" DeltaLon = " + (m_Data.Longitude - m_OldData.Longitude).ToString() +
-							" DeltaAlt = " + (m_Data.Altitude - m_OldData.Altitude).ToString(), Color.DarkBlue, 2);
-						}
+                if (m_bSelected)
+                {
+                    Log.LogMessage("Peer [" + m_CallSign + "] Update_AI Eception occured : " + e.Message, Color.DarkBlue, 2);
+                }
 #endif
-					}
-
-					//Si c'est le premier positionnement, on initialise les données avec la position brute
-					if ((m_Spawned == 5) && m_Refresh)
-					{
-						m_AIData.Altitude = m_Data.Altitude;
-						m_AIData.Latitude = m_Data.Latitude;
-						m_AIData.Longitude = m_Data.Longitude;
-						m_AIData.Heading = m_Data.Heading;
-						m_AIData.Pitch = m_Data.Pitch;
-						m_AIData.Bank = m_Data.Bank;
-						m_LastRender = Time;
-						if (m_Spawned == 5) m_Spawned = 6;
-					}
-					if (m_AIData.Altitude > 10)
-					{
-						double AlitudeMini = (m_SendData.Altitude - m_SendData.AltitudeSol) + m_AIResolution.CG_Height;
-						double AlitudeMaxi = (m_SendData.Altitude - m_SendData.AltitudeSol) + m_AIResolution.CG_Height;//+3
-						if (m_AIData.Altitude < AlitudeMini)
-						{
-							m_AIData.Altitude = AlitudeMini;
-						}
-						else if (m_Data.OnGround && (m_AIData.Altitude > AlitudeMaxi))
-						{
-							m_AIData.Altitude = AlitudeMaxi;
-						}
-						if(m_Data.OnGround && (m_AIResolution.Pitch>0 ))
-						{
-							m_AIData.Pitch = -m_AIResolution.Pitch;
-						}
-					}
-					m_FrameCount++;
-					if (m_FrameCount > 1000) m_FrameCount = 0;
-					m_SC.Update_AI(m_ObjectID, DEFINITIONS_ID.AI_MOVE, m_AIData);
-				}
-			}
-			finally
+            }
+            finally
 			{
-				m_Mutex.ReleaseMutex();
-			}
-		}
+                m_Mutex.ReleaseMutex();
+                m_LastRender = Time;
+            }
+        }
 
 		public void ResetAI()
 		{
@@ -683,7 +704,7 @@ namespace ffs2play
         {
             public AirData()
             {
-                TimeStamp = Outils.Now;
+                TimeStamp = DateTimeEx.UtcNow;
                 Title = "";
                 Model = "";
                 Type = "";

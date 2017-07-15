@@ -1,5 +1,5 @@
 ; HM NIS Edit Wizard helper defines
-!define PRODUCT_NAME "FFSTracker P3D"
+!define PRODUCT_NAME "FFS2Play P3Dv4"
 !getdllversion ".\bin\x64\P3D-Release\ffs2play.exe" expv_
 !define PRODUCT_VERSION "${expv_1}.${expv_2}.${expv_3}"
 !define PRODUCT_PUBLISHER "ffsimulateur2.fr (c)2017"
@@ -25,6 +25,7 @@
 ;!define MUI_LANGDLL_REGISTRY_VALUENAME "NSIS:Language"
   
 ; Welcome page
+!define MUI_WELCOMEPAGE_TITLE_3LINES
 !insertmacro MUI_PAGE_WELCOME
 ; License page
 !define MUI_LICENSEPAGE_CHECKBOX
@@ -63,7 +64,7 @@ Section "SectionPrincipale" SEC01
   SetOverwrite on
   File ".\bin\x64\P3D-Release\ffs2play.exe"
   CreateDirectory "$SMPROGRAMS\FFS2PlayP3D"
-  CreateShortCut "$SMPROGRAMS\FFS2PlayP3D\ffstracker.lnk" "$INSTDIR\ffs2play.exe"
+  CreateShortCut "$SMPROGRAMS\FFS2PlayP3D\ffs2play.lnk" "$INSTDIR\ffs2play.exe"
   CreateShortCut "$DESKTOP\FFS2PlayP3D.lnk" "$INSTDIR\ffs2play.exe"
   File ".\bin\x64\P3D-Release\LockheedMartin.Prepar3D.SimConnect.dll"
   File ".\bin\x64\P3D-Release\Open.Nat.dll"
@@ -71,16 +72,7 @@ Section "SectionPrincipale" SEC01
   File ".\bin\x64\P3D-Release\x64\SQLite.Interop.dll"
   File ".\bin\x64\P3D-Release\SharpCompress.dll"
   File ".\bin\x64\P3D-Release\protobuf-net.dll"
-  File ".\bin\x64\P3D-Release\ENG.WMOCodes.Decoders.dll"
-  File ".\bin\x64\P3D-Release\ENG.WMOCodes.dll"
-  File ".\bin\x64\P3D-Release\ENG.WMOCodes.Downloaders.dll"
-  File ".\bin\x64\P3D-Release\ENG.WMOCodes.Formatters.dll"
-  File ".\bin\x64\P3D-Release\ENG.WMOCodes.Formatters.InfoFormatter.dll"
-  File ".\bin\x64\P3D-Release\ENG.WMOCodes.Formatters.ShortInfo.dll"
-  File ".\bin\x64\P3D-Release\ESystem.dll"
-  File ".\bin\x64\P3D-Release\ESystem.Extensions.dll"
   File "readme.txt"
-  ${registerExtension} "$INSTDIR\ffstracker.exe"  ".pirep" "FFSTracker pirep"
 SectionEnd
  
 Section -AdditionalIcons
