@@ -781,7 +781,7 @@ namespace ffs2play
                 FireSCAICreated(new SCManagerEventAICreated(Tail, data.dwObjectID));
 				AIProcess.Remove(data.dwRequestID);
                 m_scConnection.RequestDataOnSimObject((REQUESTS_ID)((uint)REQUESTS_ID.AI_UPDATE + data.dwObjectID), DEFINITIONS_ID.AI_UPDATE, data.dwObjectID, SIMCONNECT_PERIOD.SIM_FRAME, SIMCONNECT_DATA_REQUEST_FLAG.DEFAULT, 0, 0, 0);
-
+                
 			}
 			else
 			{

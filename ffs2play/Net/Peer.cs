@@ -43,6 +43,9 @@ using ProtoBuf;
 
 namespace ffs2play
 {
+    /// <summary>
+    /// Protocol de communication entre PEER
+    /// </summary>
 	enum Protocol
 	{
 		PING,
@@ -54,16 +57,9 @@ namespace ffs2play
 		REQ_VERSION
 	}
 
-	public struct Deltas
-	{
-		public double Longitude;
-		public double Latitude;
-		public double Altitude;
-		public double Heading;
-		public double Pitch;
-		public double Bank;
-	}
-
+    /// <summary>
+    /// Classe représentant un PEER
+    /// </summary>
 	public partial class Peer : IDisposable
 	{
 		private System.Timers.Timer HeartBeat;
@@ -130,10 +126,9 @@ namespace ffs2play
         private bool m_bBlockData;
         private double m_old_fps;
         private double m_old_GND_AI;
-        private double m_old_ALT_AI;
 
 		/// <summary>
-		/// Constructeur d'un Pair P2P
+		/// Constructeur d'un PEER P2P
 		/// </summary>
 		/// <param name="pServer"></param>
 		public Peer(ref UDPServer pServer, IPAddress pExternalIP, int pPort, string CallSign, bool pDisabled = false, bool pLocal = false, List<IPAddress> pInternalIP = null)
@@ -169,21 +164,38 @@ namespace ffs2play
             m_bBlockData = false;
         }
 
+        /// <summary>
+        /// Bloquage de la réception des données du PEER
+        /// Utilisé en mode debug pour simuler un PEER ne recevant plus de données
+        /// </summary>
+
         public bool BlockData
         {
             get { return m_bBlockData; }
             set { m_bBlockData = value; }
         }
 
+        /// <summary>
+        /// Correspondance de l'AI
+        /// </summary>
+
 		public AIResol AIResolution
 		{
 			get { return m_AIResolution; }
 		}
 
+        /// <summary>
+        /// Affichable
+        /// </summary>
+
 		public bool Spawnable
 		{
 			get { return m_bSpawnable; }
 		}
+
+        /// <summary>
+        /// Bloquaqe du PEER
+        /// </summary>
 
 		public bool Disabled
 		{
@@ -199,11 +211,19 @@ namespace ffs2play
 			}
 		}
 
+        /// <summary>
+        /// Selection du PEER par le parent (P2PManager)
+        /// </summary>
+
 		public bool Selected
 		{
 			get { return m_bSelected; }
 			set { m_bSelected = value; }
 		}
+
+        /// <summary>
+        /// initialise et démarre l'entité PEER
+        /// </summary>
 
 		private void Start ()
 		{
@@ -241,6 +261,9 @@ namespace ffs2play
 			m_bDisabled = false;
 		}
 
+        /// <summary>
+        /// Bloque et inhibe un PEER tout en le maintenant existant
+        /// </summary>
 		private void Stop ()
 		{
 			if (m_bDisabled) return;
@@ -263,7 +286,6 @@ namespace ffs2play
 			P2P.UpdateListItem(m_CallSign);
 		}
 
-		// Flag: Has Dispose already been called?
 		bool disposed = false;
 		// Instantiate a SafeHandle instance.
 		SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
@@ -658,15 +680,12 @@ namespace ffs2play
                         if ((m_AIData.Altitude > 10) && (m_AISimData.SolAltitude!=0))
 					    {
                             // Mise à jour de l'altitude sol de référence
-                            if ((m_old_GND_AI == 0) || (m_old_GND_AI != m_AISimData.SolAltitude))
-                            {
-                                m_old_GND_AI = m_AISimData.SolAltitude;
+                            m_old_GND_AI = m_AISimData.SolAltitude;
                                 m_AIData.Altitude = m_AISimData.SolAltitude + m_AIResolution.CG_Height;
                                 if (m_AIResolution.Pitch > 0)
                                 {
                                     m_AIData.Pitch = m_ActualPos.Pitch - m_AIResolution.Pitch;
                                 }
-                            }
                         }
                     }
                     if (m_Spawned >= 7) m_SC.Update_AI(m_ObjectID, DEFINITIONS_ID.AI_MOVE, m_AIData);
@@ -697,7 +716,7 @@ namespace ffs2play
 		}
 
         /// <summary>
-        /// Classe de donnée de l'appareil à un instant donné
+        /// Classe de donnée du PEER à un instant donné
         /// </summary>
         [ProtoContract]
         class AirData
