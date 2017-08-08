@@ -99,7 +99,6 @@ namespace ffs2play
                 MemoryStream Data = new MemoryStream();
                 Serializer.Serialize(Data,sInternalIP);
                 return Convert.ToBase64String(Data.ToArray());
-
             }
 		}
 
@@ -274,7 +273,7 @@ namespace ffs2play
                             if (Pair.BlockData) BlockDataItem.Checked = true;
                             contextMenu.MenuItems.Add(BlockDataItem);
 #endif
-                        }
+						}
 						MenuItem UserMenuItem = new MenuItem("Masquer");
 						if (Properties.Settings.Default.P2PBlackList.Contains(m_Item.Text)) UserMenuItem.Checked = true;
 						UserMenuItem.Click += UserMenuItem_Click;
@@ -293,12 +292,12 @@ namespace ffs2play
         }
 #endif
 
-        /// <summary>
-        /// Ouvre la boite de dialogue de remplacement d'AI
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ResolMenuItem_Click(object sender, EventArgs e)
+		/// <summary>
+		/// Ouvre la boite de dialogue de remplacement d'AI
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ResolMenuItem_Click(object sender, EventArgs e)
 		{
 			Peer Pair = Peers.Find(x => x.CallSign == m_Item.Text);
 			dlgResolAI ResolAI = new dlgResolAI(Pair.Titre);
@@ -381,17 +380,17 @@ namespace ffs2play
 				if (m_bUPNP) return;
 				var t = Task.Run(async () =>
 				{
-				    var nat = new NatDiscoverer();
-				    var cts = new CancellationTokenSource();
-                    try
-                    {
-					Device = await nat.DiscoverDeviceAsync(PortMapper.Upnp, cts);
+					var nat = new NatDiscoverer();
+					var cts = new CancellationTokenSource();
+					try
+					{
+						Device = await nat.DiscoverDeviceAsync(PortMapper.Upnp, cts);
 #if DEBUG
-					Log.LogMessage("P2PManager: Routeur UPNP détecté", Color.DarkBlue, 1);
+						Log.LogMessage("P2PManager: Routeur UPNP détecté", Color.DarkBlue, 1);
 #endif
-                    await Device.CreatePortMapAsync(new Mapping(Open.Nat.Protocol.Udp, m_Port, m_Port, 0, "ffs2playP3D"));
+						await Device.CreatePortMapAsync(new Mapping(Open.Nat.Protocol.Udp, m_Port, m_Port, 0, "ffs2playP3D"));
 #if DEBUG
-					Log.LogMessage("P2PManager: Ouverture du port UPNP ok", Color.DarkBlue, 1);
+						Log.LogMessage("P2PManager: Ouverture du port UPNP ok", Color.DarkBlue, 1);
 #endif
 					}
 					catch (AggregateException ae)
@@ -412,34 +411,34 @@ namespace ffs2play
 						});
 					}
 					m_bUPNP = true;
-                });
+				});
 			}
 			else
 			{
 				if ((!m_bUPNP) || (Device==null)) return;
-                var t = Task.Run(async () =>
+				var t = Task.Run(async () =>
 				{
-				    try
-				    {
-                        await Device.DeletePortMapAsync(new Mapping(Open.Nat.Protocol.Udp, m_Port, m_Port));
+					try
+					{
+						await Device.DeletePortMapAsync(new Mapping(Open.Nat.Protocol.Udp, m_Port, m_Port));
 #if DEBUG
-					Log.LogMessage("P2PManager: Fermeture du port UPNP ok", Color.DarkBlue, 1);
+						Log.LogMessage("P2PManager: Fermeture du port UPNP ok", Color.DarkBlue, 1);
 #endif
-				    }
-				    catch (AggregateException ae)
-				    {
-    					ae.Handle((x) =>
-					    {
-    						if (x is MappingException)
-						    {
-    							Log.LogMessage("P2PManager: Erreur lors de la fermetur du port", Color.DarkViolet);
-							    return true;
-						    }
-    						return false;
-	    				});
-		    		}
-			    	m_bUPNP = false;
-                });
+					}
+					catch (AggregateException ae)
+					{
+						ae.Handle((x) =>
+						{
+							if (x is MappingException)
+							{
+								Log.LogMessage("P2PManager: Erreur lors de la fermetur du port", Color.DarkViolet);
+								return true;
+							}
+							return false;
+						});
+					}
+					m_bUPNP = false;
+				});
 			}
 		}
 
@@ -514,7 +513,7 @@ namespace ffs2play
                                         string sIP = Outils.DecryptMessage(Item.Value, pAESKey);
                                         if (!IPAddress.TryParse(sIP,out IP))
                                         {
-                                            Log.LogMessage("P2P Manager : Adresse IP invalide", Color.DarkViolet);
+											Log.LogMessage("P2P Manager : Adresse IP invalide", Color.DarkViolet);
                                             IP = IPAddress.Parse("0.0.0.0");
                                         }
                                     }

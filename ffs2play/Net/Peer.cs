@@ -548,6 +548,7 @@ namespace ffs2play
                 m_AIData.Pitch = m_Data.Pitch;
                 m_AIData.Bank = m_Data.Bank;
                 m_SC.Freeze_AI(m_ObjectID, m_Data.OnGround);
+				m_LastRender = DateTimeEx.UtcNow;
                 if (m_Spawned == 5) m_Spawned = 6;
             }
             //Nous avons des données toutes fraiches et nous sommes prêt à calculer l'extrapolation
@@ -681,11 +682,7 @@ namespace ffs2play
 					    {
                             // Mise à jour de l'altitude sol de référence
                             m_old_GND_AI = m_AISimData.SolAltitude;
-                                m_AIData.Altitude = m_AISimData.SolAltitude + m_AIResolution.CG_Height;
-                                if (m_AIResolution.Pitch > 0)
-                                {
-                                    m_AIData.Pitch = m_ActualPos.Pitch - m_AIResolution.Pitch;
-                                }
+							m_AIData.Altitude = m_AISimData.SolAltitude + m_AIResolution.CG_Height;
                         }
                     }
                     if (m_Spawned >= 7) m_SC.Update_AI(m_ObjectID, DEFINITIONS_ID.AI_MOVE, m_AIData);

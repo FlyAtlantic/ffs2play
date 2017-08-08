@@ -37,4 +37,5 @@ Notes de révision:
 
 1.0.6 : Optimisation du moteur de rendu des AI : Création d'un référentiel de temps plus précis, Prédicteur et Interpolateur en thread séparé.
 		Résolution du bug du correcteur d'altitude pour les avions posés au sol : Maintenant les avions au sol vu par un autre avec un terrain différent, vois l'avion correctement posés
-		
+
+1.0.8 : Résolution Bug nouveau moteur AI : Rotation avions au sol + mauvaise initialisation position

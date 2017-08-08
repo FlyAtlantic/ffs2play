@@ -132,7 +132,7 @@ namespace ffs2play
 #if DEBUG
 										if ((CounterIn - m_Counter_In) > 1) Log.LogMessage("Peer [" + CallSign + "] Paquets Udp Manquants =" + (CounterIn - m_Counter_In - 1).ToString(), Color.DarkViolet, 1);
 #endif
-                                        RefreshData();
+                                        if (m_Spawned >=5) RefreshData();
 									}
 #if DEBUG
 									else
@@ -191,15 +191,6 @@ namespace ffs2play
 		private void OnHeartBeat(object source, ElapsedEventArgs evt)
 		{
 			SendPing();
-            if (m_SC.GetVersion() >= SIM_VERSION.P3D_V2) return;
-			TimeSpan IntervalAI = DateTimeEx.UtcNow - m_LastAIUpdate;
-			if ((m_Spawned >=6) && (IntervalAI.TotalSeconds > 20))
-			{
-				Spawn_AI(false);
-#if DEBUG
-				Log.LogMessage("Peer [" + CallSign + "] HeartBeat Détection de freeze de l'AI, recréation de l'objet", Color.DarkBlue);
-#endif
-			}
 		}
 
 		/// <summary>
@@ -210,7 +201,7 @@ namespace ffs2play
 
 		private void OnSCReceiveEventFrame(object sender, SCManagerEventFrame e)
 		{
-			if (m_Spawned >= 5) Update_AI(e.Time, e.FrameRate);
+			if (m_Spawned >= 6) Update_AI(e.Time, e.FrameRate);
 		}
 
 		/// <summary>
@@ -277,18 +268,6 @@ namespace ffs2play
 			m_LastAIUpdate =e.Time;
             m_AISimData = e.Data;
             m_Ecart = Outils.distance(m_Data.Latitude, m_Data.Longitude, m_AISimData.Latitude, m_AISimData.Longitude, 'N');
-            if (m_SC.GetVersion() >= SIM_VERSION.P3D_V2) return;
-            if (m_Spawned >= 6)
-			{
-				if ((m_Ecart > 0.4))
-				{
-					Spawn_AI(false);
-#if DEBUG
-					Log.LogMessage("Peer [" + CallSign + "] Détection de freeze de l'AI, recréation de l'objet", Color.DarkBlue);
-#endif
-					return;
-				}
-			}
 		}
 
 		/// <summary>

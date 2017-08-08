@@ -139,7 +139,7 @@ namespace ffs2play
 		{
 			if (m_bRunning && (m_listener != null))
 			{
-				m_listener.Close();
+				m_listener.Close();								 
 				m_listener = null;
 #if DEBUG
 				Log.LogMessage("UDPServer : Arrêt du serveur", Color.DarkBlue, 1);
@@ -168,7 +168,9 @@ namespace ffs2play
 			}
 			catch (ObjectDisposedException Ex)
 			{
-				Log.LogMessage("UDPServer : Problème réception de données : " + Ex.Message, Color.DarkBlue, 0);
+#if DEBUG
+                Log.LogMessage("UDPServer : Problème réception de données : " + Ex.Message, Color.DarkBlue, 1);
+#endif
 			}
 			catch (SocketException Ex)
 			{
