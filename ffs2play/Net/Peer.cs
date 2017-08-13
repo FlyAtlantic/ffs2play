@@ -655,12 +655,13 @@ namespace ffs2play
 					//Si on a suffisement de donnée (new + old) on utilise l'interpolation
 					if (m_Spawned >= 7)
 					{
-                        if (m_old_fps != 0)
-                        {
-                            FPS = (FPS + (float)m_old_fps) / 2;
-                        }
-                        m_old_fps = FPS;
-                        double Temps = 1000 / FPS;
+						float FPSAvg = FPS;
+						if (m_old_fps != 0)
+						{
+							FPSAvg = (FPS + (float)m_old_fps) / 2;
+						}
+						m_old_fps = FPS;
+						double Temps = 1000 / FPSAvg;
                         double CoefInterpol = Temps / (m_FuturData.TimeStamp - m_ActualPos.TimeStamp).TotalMilliseconds;
 						m_LastRender = Time;
 						m_AIData.Altitude += m_DeltaAltitude * CoefInterpol;
