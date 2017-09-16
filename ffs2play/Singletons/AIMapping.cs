@@ -274,14 +274,44 @@ namespace ffs2play
 				if (m_DB == null) return;
 				m_DB.Open();
 				SQLiteCommand cmd = m_DB.CreateCommand();
+				// Recherche de colonnes manquante pour mise à jour
 				cmd.CommandType = CommandType.Text;
-				cmd.CommandText = "create table if not exists " + m_Table + " ( checksum varchar(32), Titre varchar(256), Type varchar(30), Model varchar(10), Path varchar(256), Categorie varchar(20), NbMoteur int, TypeMoteur int, CGHeight real, Pitch real)";
+				cmd.CommandText = "PRAGMA table_info(" + m_Table + ");";
+				SQLiteDataReader r = cmd.ExecuteReader();
+				List<string> Colonnes = new List<string>();
+				if (r.StepCount > 0)
+				{
+					while (r.Read())
+					{
+						Colonnes.Add(r.GetString(1));
+#if DEBUG
+						Log.LogMessage("AIMapping : table_info :  " + r.GetString(1), Color.DarkOliveGreen, 2);
+#endif
+					}
+					if (!Colonnes.Contains("Editeur"))
+					{
+#if DEBUG
+						Log.LogMessage("AIMapping : Colonne Editeur manquante :  Création", Color.DarkOliveGreen, 2);
+#endif
+						cmd = m_DB.CreateCommand();
+						cmd.CommandType = CommandType.Text;
+						cmd.CommandText = "DROP TABLE " + m_Table;
+						cmd.ExecuteNonQuery();
+
+					}
+				}
+				cmd = m_DB.CreateCommand();
+				cmd.CommandType = CommandType.Text;
+				cmd.CommandText = "create table if not exists " + m_Table + " ( checksum varchar(32), Titre varchar(256) collate nocase, Editeur varchar(100) collate nocase, Type varchar(30) collate nocase, Model varchar(10) collate nocase, Path varchar(256) collate nocase, Categorie varchar(20) collate nocase, NbMoteur int, TypeMoteur int, CGHeight real, Pitch real)";
 				cmd.ExecuteNonQuery();
 				cmd = m_DB.CreateCommand();
 				cmd.CommandType = CommandType.Text;
 				cmd.CommandText = "create table if not exists Remplacement (TitreDistant varchar(256) UNIQUE, TitreLocal varchar(256), Sim varchar(16))";
 				cmd.ExecuteNonQuery();
+				cmd = m_DB.CreateCommand();
+				cmd.CommandType = CommandType.Text;
 				m_Initialized = true;
+				return;
 			}
 			catch (SQLiteException e)
 			{
@@ -379,6 +409,7 @@ namespace ffs2play
 					Log.LogMessage("AIMapping : Aucun enregistrement trouvé pour " + Key, Color.DarkOliveGreen, 2);
 #endif
 					IniFile Parser = new IniFile(Path);
+					string Editeur = Parser.IniReadValue("fltsim.0", "ui_createdby");
 					string atc_model = Parser.IniReadValue("General", "atc_model");
 					string atc_type = Parser.IniReadValue("General", "atc_type");
 					string category = Parser.IniReadValue("General", "Category");
@@ -391,14 +422,17 @@ namespace ffs2play
 					try
 					{
 						Engine_Type = Convert.ToInt32(sEngine_Type);
-						Static_CG_Height = Convert.ToDouble(sStatic_CG_Height, new CultureInfo("en-US"));
-						Static_Pitch = Convert.ToDouble(sStatic_Pitch, new CultureInfo("en-US"));
+						if (sStatic_CG_Height.Length == 0) sStatic_CG_Height = "0.0";
+						if (sStatic_Pitch.Length == 0) sStatic_Pitch = "0.0";
+						Static_CG_Height = Convert.ToDouble(sStatic_CG_Height.Replace(',','.'), new CultureInfo("en-US"));
+						Static_Pitch = Convert.ToDouble(sStatic_Pitch.Replace(',', '.'), new CultureInfo("en-US"));
 					}
 					catch (Exception e)
 					{
 						Log.LogMessage("AIMapping : DBFile Update exception = " + e.ToString(), Color.DarkViolet);
 					}
 #if DEBUG
+					Log.LogMessage("AIMapping : Editeur = " + Editeur, Color.DarkOliveGreen, 2);
 					Log.LogMessage("AIMapping : ATCModel = " + atc_model, Color.DarkOliveGreen, 2);
 					Log.LogMessage("AIMapping : ATCType = " + atc_type, Color.DarkOliveGreen, 2);
 					Log.LogMessage("AIMapping : Category = " + category, Color.DarkOliveGreen, 2);
@@ -433,6 +467,7 @@ namespace ffs2play
 							SQLiteParameter sTitre = new SQLiteParameter("@titre", Title);
 							SQLiteParameter sModel = new SQLiteParameter("@model", atc_model);
 							SQLiteParameter sType = new SQLiteParameter("@type", atc_type);
+							SQLiteParameter sEditeur = new SQLiteParameter("@editeur", Editeur);
 							SQLiteParameter sCategorie = new SQLiteParameter("@categorie", category);
 							SQLiteParameter sNbMoteur = new SQLiteParameter("@nbmoteur", nb_moteur);
 							SQLiteParameter sTypeMoteur = new SQLiteParameter("@typemoteur", Engine_Type);
@@ -449,9 +484,10 @@ namespace ffs2play
 							{
 								cmd = m_DB.CreateCommand();
 								cmd.CommandType = CommandType.Text;
-								cmd.CommandText = "INSERT INTO " + m_Table + " VALUES (@checksum, @titre, @type, @model, @path, @categorie, @nbmoteur, @typemoteur, @cgheight, @pitch)";
+								cmd.CommandText = "INSERT INTO " + m_Table + " VALUES (@checksum, @titre, @editeur, @type, @model, @path, @categorie, @nbmoteur, @typemoteur, @cgheight, @pitch)";
 								cmd.Parameters.Add(sCheckSum);
 								cmd.Parameters.Add(sTitre);
+								cmd.Parameters.Add(sEditeur);
 								cmd.Parameters.Add(sType);
 								cmd.Parameters.Add(sModel);
 								cmd.Parameters.Add(sPath);
@@ -467,9 +503,10 @@ namespace ffs2play
 							{
 								cmd = m_DB.CreateCommand();
 								cmd.CommandType = CommandType.Text;
-								cmd.CommandText = "UPDATE " + m_Table + " SET checksum = @checksum, Type = @type, Model = @model , Path = @path, Categorie = @categorie, NbMoteur = @nbmoteur, TypeMoteur = @typemoteur, CGHeight = @cgheight, Pitch = @pitch WHERE Titre=@titre";
+								cmd.CommandText = "UPDATE " + m_Table + " SET checksum = @checksum, Editeur = @editeur, Type = @type, Model = @model , Path = @path, Categorie = @categorie, NbMoteur = @nbmoteur, TypeMoteur = @typemoteur, CGHeight = @cgheight, Pitch = @pitch WHERE Titre=@titre";
 								cmd.Parameters.Add(sCheckSum);
 								cmd.Parameters.Add(sTitre);
+								cmd.Parameters.Add(sEditeur);
 								cmd.Parameters.Add(sType);
 								cmd.Parameters.Add(sModel);
 								cmd.Parameters.Add(sPath);
@@ -526,7 +563,7 @@ namespace ffs2play
 			// On commence par vérifier si le Title existe dans la DB
 			SQLiteCommand cmd = m_DB.CreateCommand();
 			cmd.CommandType = CommandType.Text;
-			cmd.CommandText = "SELECT Titre,CGHeight,Pitch FROM " + m_Table + " WHERE Titre = @titre";
+			cmd.CommandText = "SELECT Titre,CGHeight,Pitch FROM " + m_Table + " WHERE Titre = @titre COLLATE NOCASE";
 			cmd.Parameters.Add(new SQLiteParameter("@titre", Title));
 			SQLiteDataReader r = cmd.ExecuteReader();
 			if (r.StepCount > 0)
@@ -564,13 +601,56 @@ namespace ffs2play
 			return Resol;
 		}
 
-		public List<string> GetAITitreDispo()
+		public List<string> GetAITitreDispo(string Categorie = "",string Editeur = "", string Type="", string Model="")
 		{
 			List<string> Liste = new List<string>();
 			if (!m_Initialized) return Liste;
+			bool FiltresEnable = false;
+			int nbFiltre = 0;
+			if (Categorie == "*") Categorie = "";
+			if (Editeur == "*") Editeur = "";
+			if (Type == "*") Type = "";
+			if (Model == "*") Model = "";
+			if (
+				Categorie.Length > 0 ||
+				Editeur.Length > 0 ||
+				Type.Length > 0 ||
+				Model.Length > 0)
+				FiltresEnable = true;
 			SQLiteCommand cmd = m_DB.CreateCommand();
 			cmd.CommandType = CommandType.Text;
 			cmd.CommandText = "SELECT Titre FROM " + m_Table;
+			if (FiltresEnable)
+			{
+				cmd.CommandText += " WHERE ";
+				if (Categorie.Length>0)
+				{
+					nbFiltre++;
+					cmd.Parameters.Add(new SQLiteParameter("@categorie", Categorie));
+					cmd.CommandText += " Categorie like @categorie";
+				}
+				if (Editeur.Length>0)
+				{
+					if (nbFiltre>0) cmd.CommandText += " and ";
+					nbFiltre++;
+					cmd.Parameters.Add(new SQLiteParameter("@editeur", Editeur));
+					cmd.CommandText += " Editeur like @editeur";
+				}
+				if (Type.Length > 0)
+				{
+					if (nbFiltre > 0) cmd.CommandText += " and ";
+					nbFiltre++;
+					cmd.Parameters.Add(new SQLiteParameter("@type", Type));
+					cmd.CommandText += " Type like @type";
+				}
+				if (Model.Length > 0)
+				{
+					if (nbFiltre > 0) cmd.CommandText += " and ";
+					nbFiltre++;
+					cmd.Parameters.Add(new SQLiteParameter("@model", Model));
+					cmd.CommandText += " Model like @model";
+				}
+			}
 			SQLiteDataReader r = cmd.ExecuteReader();
 			if (r.StepCount > 0)
 			{
@@ -582,6 +662,87 @@ namespace ffs2play
 			return Liste;
 		}
 
+		/// <summary>
+		/// Retourn la liste des catégories enregistrées
+		/// </summary>
+		/// <returns></returns>
+		public List<string> GetCategoryList()
+		{
+			List<string> Liste = new List<string>();
+			if (!m_Initialized) return Liste;
+			SQLiteCommand cmd = m_DB.CreateCommand();
+			cmd.CommandType = CommandType.Text;
+			cmd.CommandText = "SELECT Distinct Categorie FROM " + m_Table;
+			SQLiteDataReader r = cmd.ExecuteReader();
+			if (r.StepCount > 0)
+			{
+				while (r.Read())
+				{
+					Liste.Add(r.GetString(0));
+				}
+			}
+			return Liste;
+		}
+
+		public List<string> GetEditeurList()
+		{
+			List<string> Liste = new List<string>();
+			if (!m_Initialized) return Liste;
+			SQLiteCommand cmd = m_DB.CreateCommand();
+			cmd.CommandType = CommandType.Text;
+			cmd.CommandText = "SELECT Distinct Editeur FROM " + m_Table;
+			SQLiteDataReader r = cmd.ExecuteReader();
+			if (r.StepCount > 0)
+			{
+				while (r.Read())
+				{
+					Liste.Add(r.GetString(0));
+				}
+			}
+			return Liste;
+		}
+
+		public List<string> GetATCTypeList()
+		{
+			List<string> Liste = new List<string>();
+			if (!m_Initialized) return Liste;
+			SQLiteCommand cmd = m_DB.CreateCommand();
+			cmd.CommandType = CommandType.Text;
+			cmd.CommandText = "SELECT Distinct Type FROM " + m_Table;
+			SQLiteDataReader r = cmd.ExecuteReader();
+			if (r.StepCount > 0)
+			{
+				while (r.Read())
+				{
+					Liste.Add(r.GetString(0));
+				}
+			}
+			return Liste;
+		}
+
+		public List<string> GetATCModelList()
+		{
+			List<string> Liste = new List<string>();
+			if (!m_Initialized) return Liste;
+			SQLiteCommand cmd = m_DB.CreateCommand();
+			cmd.CommandType = CommandType.Text;
+			cmd.CommandText = "SELECT Distinct Model FROM " + m_Table;
+			SQLiteDataReader r = cmd.ExecuteReader();
+			if (r.StepCount > 0)
+			{
+				while (r.Read())
+				{
+					Liste.Add(r.GetString(0));
+				}
+			}
+			return Liste;
+		}
+
+		/// <summary>
+		/// Retourne le titre de remplacement mémorisée pour un titre distant
+		/// </summary>
+		/// <param name="pTitre"></param>
+		/// <returns></returns>
 		public string GetRule(string pTitre)
 		{
 			if (!m_Initialized) return "";
@@ -703,6 +864,10 @@ namespace ffs2play
 			}
 			return "";
 		}
+
+		/// <summary>
+		/// Purge les AI supprimés ou inéxistants 
+		/// </summary>
 
 		private void DBFilePurge()
 		{

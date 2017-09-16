@@ -39,3 +39,7 @@ Notes de révision:
 		Résolution du bug du correcteur d'altitude pour les avions posés au sol : Maintenant les avions au sol vu par un autre avec un terrain différent, vois l'avion correctement posés
 
 1.0.8 : Résolution Bug nouveau moteur AI : Rotation avions au sol + mauvaise initialisation position
+
+1.0.9 : Résolution BUG FSX et suppression du freeze detect
+
+1.0.10 : Création Filtre de recherche pour le remplacement des AI
