@@ -631,6 +631,8 @@ namespace ffs2play
 					m_AIData.AileronPos = m_Data.AileronPos;
 					m_AIData.ElevatorPos = m_Data.ElevatorPos;
 					m_AIData.RudderPos = m_Data.RudderPos;
+					m_AIData.SpoilerPos = m_Data.SpoilerPos;
+					m_AIData.ParkingBrakePos = m_Data.ParkingBrakePos;
 					m_AIData.Door1Pos = m_Data.Door1Pos;
 					m_AIData.Door2Pos = m_Data.Door2Pos;
 					m_AIData.Door3Pos = m_Data.Door3Pos;
@@ -740,6 +742,8 @@ namespace ffs2play
                 ElevatorPos = 0;
                 AileronPos = 0;
                 RudderPos = 0;
+				SpoilerPos = 0;
+				ParkingBrakePos = 0;
                 Door1Pos = 0;
                 Door2Pos = 0;
                 Door3Pos = 0;
@@ -789,6 +793,8 @@ namespace ffs2play
                 ElevatorPos = Object.ElevatorPos;
                 AileronPos = Object.AileronPos;
                 RudderPos = Object.RudderPos;
+				SpoilerPos = Object.SpoilerPos;
+				ParkingBrakePos = Object.ParkingBrakePos;
                 Door1Pos = Object.Door1Pos;
                 Door2Pos = Object.Door2Pos;
                 Door3Pos = Object.Door3Pos;
@@ -834,6 +840,8 @@ namespace ffs2play
                 ElevatorPos = Object.ElevatorPos;
                 AileronPos = Object.AileronPos;
                 RudderPos = Object.RudderPos;
+				SpoilerPos = Object.SpoilerPos;
+				ParkingBrakePos = Object.ParkingBrakePos;
                 Door1Pos = Object.Door1Pos;
                 Door2Pos = Object.Door2Pos;
                 Door3Pos = Object.Door3Pos;
@@ -897,7 +905,11 @@ namespace ffs2play
             public double AileronPos;
             [ProtoMember(17)]
             public double RudderPos;
-            [ProtoMember(18)]
+			[ProtoMember(40)]
+			public double SpoilerPos;
+			[ProtoMember(41)]
+			public double ParkingBrakePos;
+			[ProtoMember(18)]
             public int Door1Pos;
             [ProtoMember(19)]
             public int Door2Pos;

@@ -43,3 +43,5 @@ Notes de révision:
 1.0.9 : Résolution BUG FSX et suppression du freeze detect
 
 1.0.10 : Création Filtre de recherche pour le remplacement des AI
+
+1.0.11 : Ajout transmission des spoilers et le parking brake pour les animations

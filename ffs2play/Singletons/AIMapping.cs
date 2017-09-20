@@ -308,8 +308,6 @@ namespace ffs2play
 				cmd.CommandType = CommandType.Text;
 				cmd.CommandText = "create table if not exists Remplacement (TitreDistant varchar(256) UNIQUE, TitreLocal varchar(256), Sim varchar(16))";
 				cmd.ExecuteNonQuery();
-				cmd = m_DB.CreateCommand();
-				cmd.CommandType = CommandType.Text;
 				m_Initialized = true;
 				return;
 			}

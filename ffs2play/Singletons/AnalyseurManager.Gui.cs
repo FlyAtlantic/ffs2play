@@ -139,7 +139,13 @@ namespace ffs2play
                         case "Derive":
                             Sub.Text = string.Format("{0:0.000}", GetLastState().RudderPos);
                             break;
-                        case "Squawk":
+						case "Aerofreins":
+							Sub.Text = string.Format("{0:0.000}", GetLastState().SpoilerPos);
+							break;
+						case "Frein de parking":
+							Sub.Text = string.Format("{0:0.000}", GetLastState().ParkingBrakePos);
+							break;
+						case "Squawk":
                             Sub.Text = string.Format("{0:0}", Outils.ConvertToBinaryCodedDecimal(GetLastState().Squawk));
                             break;
                         default:

@@ -209,6 +209,8 @@ namespace ffs2play
 		public double ElevatorPos;
 		public double AileronPos;
 		public double RudderPos;
+		public double SpoilerPos;
+		public double ParkingBrakePos;
 		public int Door1Pos;
 		public int Door2Pos;
 		public int Door3Pos;
@@ -241,6 +243,8 @@ namespace ffs2play
 		public double ElevatorPos;
 		public double AileronPos;
 		public double RudderPos;
+		public double SpoilerPos;
+		public double ParkingBrakePos;
 		public int Door1Pos;
 		public int Door2Pos;
 		public int Door3Pos;
@@ -576,6 +580,8 @@ namespace ffs2play
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.PERIODIQUE, "ELEVATOR POSITION", "Position", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.PERIODIQUE, "AILERON POSITION", "Position", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.PERIODIQUE, "RUDDER POSITION", "Position", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
+			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.PERIODIQUE, "SPOILERS HANDLE POSITION", "Position", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
+			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.PERIODIQUE, "BRAKE PARKING POSITION", "Position", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.PERIODIQUE, "EXIT OPEN:0", "Percent", SIMCONNECT_DATATYPE.INT32, 0.0f, SimConnect.SIMCONNECT_UNUSED);
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.PERIODIQUE, "EXIT OPEN:1", "Percent", SIMCONNECT_DATATYPE.INT32, 0.0f, SimConnect.SIMCONNECT_UNUSED);
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.PERIODIQUE, "EXIT OPEN:2", "Percent", SIMCONNECT_DATATYPE.INT32, 0.0f, SimConnect.SIMCONNECT_UNUSED);
@@ -604,6 +610,8 @@ namespace ffs2play
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.AI_MOVE, "ELEVATOR POSITION", "Position", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.AI_MOVE, "AILERON POSITION", "Position", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.AI_MOVE, "RUDDER POSITION", "Position", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
+			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.AI_MOVE, "SPOILERS HANDLE POSITION", "Position", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
+			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.AI_MOVE, "BRAKE PARKING POSITION", "Position", SIMCONNECT_DATATYPE.FLOAT64, 0.0f, SimConnect.SIMCONNECT_UNUSED);
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.AI_MOVE, "EXIT OPEN:0", "Percent", SIMCONNECT_DATATYPE.INT32, 0.0f, SimConnect.SIMCONNECT_UNUSED);
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.AI_MOVE, "EXIT OPEN:1", "Percent", SIMCONNECT_DATATYPE.INT32, 0.0f, SimConnect.SIMCONNECT_UNUSED);
 			m_scConnection.AddToDataDefinition(DEFINITIONS_ID.AI_MOVE, "EXIT OPEN:2", "Percent", SIMCONNECT_DATATYPE.INT32, 0.0f, SimConnect.SIMCONNECT_UNUSED);

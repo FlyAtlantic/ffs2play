@@ -181,6 +181,12 @@
             "Derive",
             ""}, -1, System.Drawing.Color.Black, System.Drawing.Color.DarkGray, new System.Drawing.Font("Microsoft Sans Serif", 8.25F));
 			System.Windows.Forms.ListViewItem listViewItem51 = new System.Windows.Forms.ListViewItem(new string[] {
+            "Aerofreins",
+            ""}, -1);
+			System.Windows.Forms.ListViewItem listViewItem52 = new System.Windows.Forms.ListViewItem(new string[] {
+            "Frein de parking",
+            ""}, -1);
+			System.Windows.Forms.ListViewItem listViewItem53 = new System.Windows.Forms.ListViewItem(new string[] {
             "Squawk",
             ""}, -1, System.Drawing.Color.Black, System.Drawing.Color.DarkGray, new System.Drawing.Font("Microsoft Sans Serif", 8.25F));
 			this.scMainWindow = new System.Windows.Forms.SplitContainer();
@@ -696,7 +702,9 @@
             listViewItem48,
             listViewItem49,
             listViewItem50,
-            listViewItem51});
+            listViewItem51,
+            listViewItem52,
+            listViewItem53});
 			this.lvDonneesFS.Location = new System.Drawing.Point(3, 3);
 			this.lvDonneesFS.MultiSelect = false;
 			this.lvDonneesFS.Name = "lvDonneesFS";

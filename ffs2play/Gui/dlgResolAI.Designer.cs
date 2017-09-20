@@ -307,7 +307,12 @@
 			this.cbNbMoteurs.Enabled = false;
 			this.cbNbMoteurs.FormattingEnabled = true;
 			this.cbNbMoteurs.Items.AddRange(new object[] {
-            "*"});
+            "*",
+            "0",
+            "1",
+            "2",
+            "3",
+            "4"});
 			this.cbNbMoteurs.Location = new System.Drawing.Point(124, 57);
 			this.cbNbMoteurs.Name = "cbNbMoteurs";
 			this.cbNbMoteurs.Size = new System.Drawing.Size(103, 21);
