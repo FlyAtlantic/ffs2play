@@ -859,8 +859,11 @@
 			this.tableLayoutPanel2.ResumeLayout(false);
 			this.tableLayoutPanel2.PerformLayout();
 			this.ResumeLayout(false);
+			this.mainStatusBar = new System.Windows.Forms.StatusBar();
+			this.mainStatusBar.ShowPanels = true;
+			this.Controls.Add(this.mainStatusBar);
 
-        }
+		}
 
 #endregion
         private System.Windows.Forms.SplitContainer scMainWindow;
@@ -904,6 +907,7 @@
         private System.Windows.Forms.TextBox tbMetarManuel;
         private System.Windows.Forms.Button btnEnvoyerMetar;
         private System.Windows.Forms.RichTextBox rtbDecryptedMetar;
-    }
+		private System.Windows.Forms.StatusBar mainStatusBar;
+	}
 }
 
