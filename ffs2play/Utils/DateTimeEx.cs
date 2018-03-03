@@ -59,12 +59,12 @@ namespace ffs2play
             _stopWatch = Stopwatch.StartNew();
         }
 
-        public static long UnixTimestampFromDateTime(DateTime date)
+        public static ulong UnixTimestampFromDateTime(DateTime date)
         {
-            return (long)(date - UnixEpoch).TotalMilliseconds;
+            return (ulong)(date - UnixEpoch).TotalMilliseconds;
         }
 
-        public static DateTime TimeFromUnixTimestamp(long millis)
+        public static DateTime TimeFromUnixTimestamp(ulong millis)
         {
             return UnixEpoch.AddMilliseconds(millis);
         }

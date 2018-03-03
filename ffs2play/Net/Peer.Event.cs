@@ -72,7 +72,7 @@ namespace ffs2play
 						{
 							m_Latence = TimeSpan.FromMilliseconds((evt.Time - m_LastPing).TotalMilliseconds/2);
 							m_Counter = 0;
-							DateTime TimePong = DateTimeEx.TimeFromUnixTimestamp(reader.ReadInt64());
+							DateTime TimePong = DateTimeEx.TimeFromUnixTimestamp(reader.ReadUInt64());
 							if (m_MiniPing > m_Latence.TotalMilliseconds)
 							{
 								m_Decalage = evt.Time - m_Latence - TimePong;
@@ -116,8 +116,8 @@ namespace ffs2play
                                         reader.BaseStream.Seek(2, 0);
 
                                         m_Data = (AirData)Serializer.Deserialize<AirData>(reader.BaseStream);
-										m_Data.TimeStamp += m_Decalage;
-										if (m_Data.TimeStamp <= m_OldData.TimeStamp)
+                                        m_Data.TimeStamp += (ulong)m_Decalage.TotalMilliseconds;
+                                        if (m_Data.TimeStamp <= m_OldData.TimeStamp)
 										{
 #if DEBUG
 											Log.LogMessage("Peer[" + CallSign + "] Donées en retard ignorées", Color.DarkBlue, 1);
@@ -127,7 +127,7 @@ namespace ffs2play
 										if ((m_Spawned >= 4) && (m_Spawned < 5)) m_Spawned++;
 										m_RefreshRate = evt.Time - m_LastData;
 										m_LastData = evt.Time;
-										m_RemoteRefreshRate = m_Data.TimeStamp - m_OldData.TimeStamp;
+                                        m_RemoteRefreshRate = TimeSpan.FromMilliseconds(m_Data.TimeStamp - m_OldData.TimeStamp);
 										m_Distance = Outils.distance(m_Data.Latitude, m_Data.Longitude, m_SendData.Latitude, m_SendData.Longitude, 'N');
 #if DEBUG
 										if ((CounterIn - m_Counter_In) > 1) Log.LogMessage("Peer [" + CallSign + "] Paquets Udp Manquants =" + (CounterIn - m_Counter_In - 1).ToString(), Color.DarkViolet, 1);

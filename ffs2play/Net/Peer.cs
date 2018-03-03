@@ -100,7 +100,7 @@ namespace ffs2play
 		private byte m_Version;
 		private int m_Spawned;
 		private AnalyseurManager m_Analyseur;
-		public const byte PROTO_VERSION = 13;
+		public const byte PROTO_VERSION = 14;
 		private double m_PredictiveTime;
 		private List<double> m_FrameRateArray;
 		//Synchronisation des demandes de AI
@@ -555,15 +555,16 @@ namespace ffs2play
             if (m_Spawned >= 6)
             {
                 double CoefHoriz = 0;
+                ulong LastRender = DateTimeEx.UnixTimestampFromDateTime(m_LastRender);
                 m_PredictiveTime = m_RemoteRefreshRate.TotalMilliseconds*3;
                 //Calcul de l'extrapolation
-                double Retard = (m_LastData - m_Data.TimeStamp).TotalMilliseconds; //Calcul du retard absolu de la donnée
+                long Retard = (long)(DateTimeEx.UnixTimestampFromDateTime(m_LastData) - m_Data.TimeStamp); //Calcul du retard absolu de la donnée
                 if (Retard < 0) Retard = 0;
                 //double Periode = m_RemoteRefreshRate.TotalMilliseconds; //Calcul de la période entre deux données
                 if (m_RemoteRefreshRate.TotalMilliseconds > 0)
                 {
                     // On mémorise la position actuelle de l'extrapolation
-                    m_ActualPos.TimeStamp = m_LastRender;
+                    m_ActualPos.TimeStamp = LastRender;
                     m_ActualPos.Altitude = m_AIData.Altitude;
                     m_ActualPos.Latitude = m_AIData.Latitude;
                     m_ActualPos.Longitude = m_AIData.Longitude;
@@ -571,8 +572,8 @@ namespace ffs2play
                     m_ActualPos.Bank = m_AIData.Bank;
                     m_ActualPos.Pitch = m_AIData.Pitch;
 
-                    m_FuturData.TimeStamp = m_LastRender + TimeSpan.FromMilliseconds(m_PredictiveTime);
-                    CoefHoriz = (m_FuturData.TimeStamp - m_Data.TimeStamp).TotalMilliseconds / m_RemoteRefreshRate.TotalMilliseconds;
+                    m_FuturData.TimeStamp = LastRender + (ulong)m_PredictiveTime;
+                    CoefHoriz = (m_FuturData.TimeStamp - m_Data.TimeStamp) / m_RemoteRefreshRate.TotalMilliseconds;
                     m_FuturData.Altitude = m_Data.Altitude + ((m_Data.Altitude - m_OldData.Altitude) * CoefHoriz);
                     m_FuturData.Longitude = m_Data.Longitude + ((m_Data.Longitude - m_OldData.Longitude) * CoefHoriz);
                     m_FuturData.Latitude = m_Data.Latitude + ((m_Data.Latitude - m_OldData.Latitude) * CoefHoriz);
@@ -664,7 +665,7 @@ namespace ffs2play
 						}
 						m_old_fps = FPS;
 						double Temps = 1000 / FPSAvg;
-                        double CoefInterpol = Temps / (m_FuturData.TimeStamp - m_ActualPos.TimeStamp).TotalMilliseconds;
+                        double CoefInterpol = Temps / (m_FuturData.TimeStamp - m_ActualPos.TimeStamp);
 						m_LastRender = Time;
 						m_AIData.Altitude += m_DeltaAltitude * CoefInterpol;
 						m_AIData.Latitude += m_DeltaLatitude * CoefInterpol;
@@ -723,7 +724,7 @@ namespace ffs2play
         {
             public AirData()
             {
-                TimeStamp = DateTimeEx.UtcNow;
+                TimeStamp = DateTimeEx.UnixTimestampFromDateTime(DateTimeEx.UtcNow);
                 Title = "";
                 Model = "";
                 Type = "";
@@ -823,7 +824,7 @@ namespace ffs2play
 
             public void Clone(AircraftState Object)
             {
-                TimeStamp = Object.TimeStamp;
+                TimeStamp = DateTimeEx.UnixTimestampFromDateTime(Object.TimeStamp);
                 Title = Object.Title;
                 Model = Object.Model;
                 Type = Object.Type;
@@ -869,7 +870,7 @@ namespace ffs2play
             }
             //Temps réel
             [ProtoMember(1)]
-            public DateTime TimeStamp;
+            public ulong TimeStamp;
             [ProtoMember(2)]
             public string Title;
             [ProtoMember(3)]

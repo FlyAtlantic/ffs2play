@@ -45,3 +45,5 @@ Notes de révision:
 1.0.10 : Création Filtre de recherche pour le remplacement des AI
 
 1.0.11 : Ajout transmission des spoilers et le parking brake pour les animations
+
+1.1.0  : Mise en compatibilité avec FFS2play2. Compilation avec la dernière SDK P3D 4 (pour la version spéciale P3D4)

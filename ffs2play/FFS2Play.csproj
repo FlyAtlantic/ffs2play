@@ -64,8 +64,9 @@
     <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
-    <Reference Include="LockheedMartin.Prepar3D.SimConnect">
-      <HintPath>D:\Program Files\Lockheed Martin\Prepar3D v4 SDK 4.0.23.21468\lib\SimConnect\managed\LockheedMartin.Prepar3D.SimConnect.dll</HintPath>
+    <Reference Include="LockheedMartin.Prepar3D.SimConnect, Version=4.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>D:\Program Files\Lockheed Martin\Prepar3D v4 SDK 4.1.7.22841\lib\SimConnect\managed\LockheedMartin.Prepar3D.SimConnect.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.FlightSimulator.SimConnect, Version=10.0.62615.0, Culture=neutral, PublicKeyToken=5f523ae7e6e1b389, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>

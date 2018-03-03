@@ -40,8 +40,6 @@ namespace ffs2play
 		private AIMapping m_Mapping;
 		private List<string> ListeLocal;
 		private List<string> CategoryList;
-		private List<string> NbMoteurList;
-		private List<string> TypeMoteurList;
 		private List<string> ATCTypeList;
 		private List<string> ATCModelList;
 		private List<string> EditeurList;
