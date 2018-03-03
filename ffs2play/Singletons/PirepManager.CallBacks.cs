@@ -203,7 +203,7 @@ namespace ffs2play
             // Si le contenu est vide on ignore le CB
 			if (xmlDoc == null) return;
 
-			LastGoodUpdate = DateTimeEx.UtcNow;
+			LastGoodUpdate = DateTimeEx.UtcNowMilli;
             //On vérifie les erreurs retournées par le serveur
 			if (CheckError(xmlDoc))
             {

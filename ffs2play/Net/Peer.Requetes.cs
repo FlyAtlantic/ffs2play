@@ -69,7 +69,7 @@ namespace ffs2play
 
 		private void SendPing()
 		{
-			m_LastPing = DateTimeEx.UtcNow;
+			m_LastPing = DateTimeEx.UtcNowMilli;
 			MemoryStream Output = new MemoryStream();
 			BinaryWriter BOutput = new BinaryWriter(Output);
 			BOutput.Write((byte)Protocol.PING);
@@ -91,12 +91,12 @@ namespace ffs2play
 			}
 		}
 
-		private void SendPong(DateTime Time)
+		private void SendPong(long Time)
 		{
 			MemoryStream Output = new MemoryStream();
 			BinaryWriter BOutput = new BinaryWriter(Output);
 			BOutput.Write((byte)Protocol.PONG);
-			BOutput.Write(DateTimeEx.UnixTimestampFromDateTime(Time));
+			BOutput.Write(Time);
 			Send(ref Output);
 		}
 

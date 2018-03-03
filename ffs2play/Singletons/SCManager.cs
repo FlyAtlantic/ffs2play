@@ -283,10 +283,10 @@ namespace ffs2play
 
     public partial class SCManager : IDisposable
 	{
-		private TimeSpan m_VariableRate;
-		private DateTime m_LastVariable;
-		private TimeSpan m_SimRate;
-		private DateTime m_LastSim;
+		private long m_VariableRate;
+		private long m_LastVariable;
+		private long m_SimRate;
+		private long m_LastSim;
 		// Pointeur sur la librairie de simconnect
 		private SimConnect m_scConnection;
 
@@ -335,8 +335,8 @@ namespace ffs2play
 			m_bConnected = false;
 			m_scConnection = null;
 			m_SimStart = false;
-			m_VariableRate = TimeSpan.FromMilliseconds(100);
-			m_LastVariable = DateTimeEx.UtcNow;
+			m_VariableRate = 100;
+			m_LastVariable = DateTimeEx.UtcNowMilli;
 			//m_Thread.IsBackground = true;
             AIProcess = new Dictionary<uint, string>();
 			Log = Logger.Instance;
@@ -831,7 +831,7 @@ namespace ffs2play
 			switch ((REQUESTS_ID)data.dwRequestID)
 			{
 				case REQUESTS_ID.PERIODIQUE:
-                    m_LastSim = DateTimeEx.UtcNow;
+                    m_LastSim = DateTimeEx.UtcNowMilli;
                     m_SimRate = m_LastSim - m_LastSim;
 					if (m_LastSim >= (m_LastVariable+m_VariableRate))
 					{
@@ -1154,11 +1154,11 @@ namespace ffs2play
 		{
 			FrameRate = pFrameRate;
 			SimSpeed = pSimSpeed;
-			Time = DateTimeEx.UtcNow;
+			Time = DateTimeEx.UtcNowMilli;
 		}
 		public float FrameRate;
 		public float SimSpeed;
-		public DateTime Time;
+		public long Time;
 	}
 
 	public class SCManagerEventAICreated : EventArgs
@@ -1187,17 +1187,17 @@ namespace ffs2play
     {
 		public SCManagerEventSCEvent()
 		{
-			Time = DateTimeEx.UtcNow;
+			Time = DateTimeEx.UtcNowMilli;
 		}
 		public SCManagerEventSCEvent (EVENT_ID pEvt_ID, uint pData)
 		{
 			Evt_Id = pEvt_ID;
 			Data = (int)pData;
-			Time = DateTimeEx.UtcNow;
+			Time = DateTimeEx.UtcNowMilli;
 		}
 		public EVENT_ID Evt_Id;
 		public int Data;
-		public DateTime Time;
+		public long Time;
 	}
 
     /// <summary>
@@ -1209,10 +1209,10 @@ namespace ffs2play
 		public SCManagerEventSCVariable (DonneesAvion pData)
 		{
 			Data = pData;
-			Time = DateTimeEx.UtcNow;
+			Time = DateTimeEx.UtcNowMilli;
 		}
 		public DonneesAvion Data;
-		public DateTime Time;
+		public long Time;
     }
 
     /// <summary>
@@ -1223,16 +1223,16 @@ namespace ffs2play
 	{
 		public SCManagerEventAIUpdate()
 		{
-			Time = DateTimeEx.UtcNow;
+			Time = DateTimeEx.UtcNowMilli;
 		}
 		public SCManagerEventAIUpdate(AIUpdateStruct pData, uint pObjectID)
 		{
 			Data = pData;
 			ObjectID = pObjectID;
-			Time = DateTimeEx.UtcNow;
+			Time = DateTimeEx.UtcNowMilli;
 		}
 		public AIUpdateStruct Data;
 		public uint ObjectID;
-		public DateTime Time;
+		public long Time;
 	}
 }

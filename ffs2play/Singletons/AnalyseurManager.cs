@@ -260,7 +260,7 @@ namespace ffs2play
 			}
         }
 
-		public void UdpateVar(DonneesAvion Donnees,DateTime Time)
+		public void UdpateVar(DonneesAvion Donnees,long Time)
 		{
 			Dernier.TimeStamp = Time;
 			Dernier.Title = Donnees.Title;
@@ -417,7 +417,7 @@ public class AnalyseurStateEvent : EventArgs
 	{
 		public AircraftState()
 		{
-			TimeStamp = DateTimeEx.UtcNow;
+			TimeStamp = DateTimeEx.UtcNowMilli;
 			Title = "";
 			Model = "";
 			Type = "";
@@ -565,7 +565,7 @@ public class AnalyseurStateEvent : EventArgs
 			Smoke = Object.Smoke;
 		}
 		//Temps réel
-		public DateTime TimeStamp;
+		public long TimeStamp;
 		public string Title;
 		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 0x100)]
 		public string Model;

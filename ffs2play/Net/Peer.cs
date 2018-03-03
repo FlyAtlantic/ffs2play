@@ -83,38 +83,38 @@ namespace ffs2play
 		private AirData m_ActualPos;
 		private AIMoveStruct m_AIData;
         private AIUpdateStruct m_AISimData;
-		private DateTime m_LastPing;
-		private DateTime m_LastData;
-		private uint m_SendInterval;
-		private DateTime m_LastStateEvent;
+		private long m_LastPing;
+		private long m_LastData;
+		private long m_SendInterval;
+		private long m_LastStateEvent;
 		private UDPServer Server;
 		private Logger Log;
 		private P2PManager P2P;
-		private TimeSpan m_Latence;
+		private long m_Latence;
 		private double m_Distance;
-		private TimeSpan m_RefreshRate;
-		private TimeSpan m_RemoteRefreshRate;
-		private TimeSpan m_Decalage;
-		private double m_MiniPing;
+		private long m_RefreshRate;
+		private long m_RemoteRefreshRate;
+		private long m_Decalage;
+		private long m_MiniPing;
 		private uint m_ObjectID;
 		private byte m_Version;
 		private int m_Spawned;
 		private AnalyseurManager m_Analyseur;
 		public const byte PROTO_VERSION = 14;
-		private double m_PredictiveTime;
+		private long m_PredictiveTime;
 		private List<double> m_FrameRateArray;
 		//Synchronisation des demandes de AI
 		private System.Timers.Timer m_TimerCreateAI;
 		private AIResol m_AIResolution;
 		private double m_Ecart;
-		private DateTime m_LastAIUpdate;
+		private long m_LastAIUpdate;
 		private bool m_bDisabled;
 		private Mutex m_Mutex;
 		private bool m_bSelected;
 		private bool m_bLocal;
 		private int m_sel_iplocal;
 		private bool m_TrySimpleAI;
-		private DateTime m_LastRender;
+		private long m_LastRender;
 		private double m_DeltaAltitude;
 		private double m_DeltaLongitude;
 		private double m_DeltaLatitude;
@@ -124,7 +124,7 @@ namespace ffs2play
 		public bool Visible;
 		private bool m_bSpawnable;
         private bool m_bBlockData;
-        private double m_old_fps;
+        private float m_old_fps;
         private double m_old_GND_AI;
 
 		/// <summary>
@@ -241,7 +241,7 @@ namespace ffs2play
 			HeartBeat.Start();
 			m_TimerCreateAI = new System.Timers.Timer(5000);
 			m_TimerCreateAI.Elapsed += OnTimerCreateAI;
-			m_LastData = DateTimeEx.UtcNow;
+			m_LastData = DateTimeEx.UtcNowMilli;
 			m_LastStateEvent = m_LastData;
 			m_Counter = 0;
 			m_Counter_In = 0;
@@ -314,7 +314,7 @@ namespace ffs2play
 			disposed = true;
 		}
 
-		public DateTime LastAIUpdate
+		public long LastAIUpdate
 		{
 			get { return m_LastAIUpdate; }
 		}
@@ -354,15 +354,15 @@ namespace ffs2play
 			get { return m_Data.Altitude; }
 		}
 
-		public double Decalage
+		public long Decalage
 
 		{
-			get { return m_Decalage.TotalMilliseconds; }
+			get { return m_Decalage; }
 		}
 
-		public int Latence
+		public long Latence
 		{
-			get { return m_Latence.Milliseconds; }
+			get { return m_Latence; }
 		}
 
 		public double Distance
@@ -370,14 +370,14 @@ namespace ffs2play
 			get { return m_Distance; }
 		}
 
-		public double RefreshRate
+		public long RefreshRate
 		{
-			get { return m_RefreshRate.TotalMilliseconds; }
+			get { return m_RefreshRate; }
 		}
 
-		public double RemoteRefreshRate
+		public long RemoteRefreshRate
 		{
-			get { return m_RemoteRefreshRate.TotalMilliseconds; }
+			get { return m_RemoteRefreshRate; }
 		}
 
 		public double Latitude
@@ -548,23 +548,22 @@ namespace ffs2play
                 m_AIData.Pitch = m_Data.Pitch;
                 m_AIData.Bank = m_Data.Bank;
                 m_SC.Freeze_AI(m_ObjectID, m_Data.OnGround);
-				m_LastRender = DateTimeEx.UtcNow;
+				m_LastRender = DateTimeEx.UtcNowMilli;
                 if (m_Spawned == 5) m_Spawned = 6;
             }
             //Nous avons des données toutes fraiches et nous sommes prêt à calculer l'extrapolation
             if (m_Spawned >= 6)
             {
                 double CoefHoriz = 0;
-                ulong LastRender = DateTimeEx.UnixTimestampFromDateTime(m_LastRender);
-                m_PredictiveTime = m_RemoteRefreshRate.TotalMilliseconds*3;
+                m_PredictiveTime = m_RemoteRefreshRate*3;
                 //Calcul de l'extrapolation
-                long Retard = (long)(DateTimeEx.UnixTimestampFromDateTime(m_LastData) - m_Data.TimeStamp); //Calcul du retard absolu de la donnée
+                long Retard =m_LastData - m_Data.TimeStamp; //Calcul du retard absolu de la donnée
                 if (Retard < 0) Retard = 0;
                 //double Periode = m_RemoteRefreshRate.TotalMilliseconds; //Calcul de la période entre deux données
-                if (m_RemoteRefreshRate.TotalMilliseconds > 0)
+                if (m_RemoteRefreshRate > 0)
                 {
                     // On mémorise la position actuelle de l'extrapolation
-                    m_ActualPos.TimeStamp = LastRender;
+                    m_ActualPos.TimeStamp = m_LastRender;
                     m_ActualPos.Altitude = m_AIData.Altitude;
                     m_ActualPos.Latitude = m_AIData.Latitude;
                     m_ActualPos.Longitude = m_AIData.Longitude;
@@ -572,8 +571,8 @@ namespace ffs2play
                     m_ActualPos.Bank = m_AIData.Bank;
                     m_ActualPos.Pitch = m_AIData.Pitch;
 
-                    m_FuturData.TimeStamp = LastRender + (ulong)m_PredictiveTime;
-                    CoefHoriz = (m_FuturData.TimeStamp - m_Data.TimeStamp) / m_RemoteRefreshRate.TotalMilliseconds;
+                    m_FuturData.TimeStamp = m_LastRender + m_PredictiveTime;
+                    CoefHoriz = (double)(m_FuturData.TimeStamp - m_Data.TimeStamp) / (double)m_RemoteRefreshRate;
                     m_FuturData.Altitude = m_Data.Altitude + ((m_Data.Altitude - m_OldData.Altitude) * CoefHoriz);
                     m_FuturData.Longitude = m_Data.Longitude + ((m_Data.Longitude - m_OldData.Longitude) * CoefHoriz);
                     m_FuturData.Latitude = m_Data.Latitude + ((m_Data.Latitude - m_OldData.Latitude) * CoefHoriz);
@@ -618,13 +617,13 @@ namespace ffs2play
 		/// Mise à jour de la position et de l'atitude de l'AI
 		/// </summary>
 		/// <param name="FrameRate"></param>
-		private void Update_AI(DateTime Time, float FPS)
+		private void Update_AI(long Time, float FPS)
 		{
             m_Mutex.WaitOne();
 			try
 			{
-				//DateTime Maintenant = DateTime.UtcNow;
-				if ((m_ObjectID == 0) || (m_Version != PROTO_VERSION)) return;
+                //DateTime Maintenant = DateTime.UtcNow;
+                if ((m_ObjectID == 0) || (m_Version != PROTO_VERSION)) return;
 
 				//On synchronise les données event
 				if (m_Spawned >= 5)
@@ -661,7 +660,7 @@ namespace ffs2play
 						float FPSAvg = FPS;
 						if (m_old_fps != 0)
 						{
-							FPSAvg = (FPS + (float)m_old_fps) / 2;
+							FPSAvg = (FPS + m_old_fps) / 2;
 						}
 						m_old_fps = FPS;
 						double Temps = 1000 / FPSAvg;
@@ -724,7 +723,7 @@ namespace ffs2play
         {
             public AirData()
             {
-                TimeStamp = DateTimeEx.UnixTimestampFromDateTime(DateTimeEx.UtcNow);
+                TimeStamp = DateTimeEx.UtcNowMilli;
                 Title = "";
                 Model = "";
                 Type = "";
@@ -824,7 +823,7 @@ namespace ffs2play
 
             public void Clone(AircraftState Object)
             {
-                TimeStamp = DateTimeEx.UnixTimestampFromDateTime(Object.TimeStamp);
+                TimeStamp = Object.TimeStamp;
                 Title = Object.Title;
                 Model = Object.Model;
                 Type = Object.Type;
@@ -870,7 +869,7 @@ namespace ffs2play
             }
             //Temps réel
             [ProtoMember(1)]
-            public ulong TimeStamp;
+            public long TimeStamp;
             [ProtoMember(2)]
             public string Title;
             [ProtoMember(3)]

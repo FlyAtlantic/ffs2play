@@ -275,12 +275,12 @@ namespace ffs2play
     {
         public IPEndPoint Client;
         public byte[] Data;
-        public DateTime Time;
+        public long Time;
         public TCPReceiveEvent(IPEndPoint p_Client, byte[] p_Data)
         {
             Client = p_Client;
             Data = p_Data;
-            Time = DateTimeEx.UtcNow;
+            Time = DateTimeEx.UtcNowMilli;
         }
     }
 }

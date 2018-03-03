@@ -70,13 +70,13 @@ namespace ffs2play
 						}
 					case Protocol.PONG:
 						{
-							m_Latence = TimeSpan.FromMilliseconds((evt.Time - m_LastPing).TotalMilliseconds/2);
+							m_Latence = (evt.Time - m_LastPing)/2;
 							m_Counter = 0;
-							DateTime TimePong = DateTimeEx.TimeFromUnixTimestamp(reader.ReadUInt64());
-							if (m_MiniPing > m_Latence.TotalMilliseconds)
+							long TimePong = reader.ReadInt64();
+							if (m_MiniPing > m_Latence)
 							{
 								m_Decalage = evt.Time - m_Latence - TimePong;
-								m_MiniPing = m_Latence.TotalMilliseconds;
+								m_MiniPing = m_Latence;
 							}
 							if (!m_OnLine)
 							{
@@ -116,7 +116,7 @@ namespace ffs2play
                                         reader.BaseStream.Seek(2, 0);
 
                                         m_Data = (AirData)Serializer.Deserialize<AirData>(reader.BaseStream);
-                                        m_Data.TimeStamp += (ulong)m_Decalage.TotalMilliseconds;
+                                        m_Data.TimeStamp += m_Decalage;
                                         if (m_Data.TimeStamp <= m_OldData.TimeStamp)
 										{
 #if DEBUG
@@ -127,7 +127,7 @@ namespace ffs2play
 										if ((m_Spawned >= 4) && (m_Spawned < 5)) m_Spawned++;
 										m_RefreshRate = evt.Time - m_LastData;
 										m_LastData = evt.Time;
-                                        m_RemoteRefreshRate = TimeSpan.FromMilliseconds(m_Data.TimeStamp - m_OldData.TimeStamp);
+                                        m_RemoteRefreshRate = m_Data.TimeStamp - m_OldData.TimeStamp;
 										m_Distance = Outils.distance(m_Data.Latitude, m_Data.Longitude, m_SendData.Latitude, m_SendData.Longitude, 'N');
 #if DEBUG
 										if ((CounterIn - m_Counter_In) > 1) Log.LogMessage("Peer [" + CallSign + "] Paquets Udp Manquants =" + (CounterIn - m_Counter_In - 1).ToString(), Color.DarkViolet, 1);
@@ -218,7 +218,7 @@ namespace ffs2play
 					m_ObjectID = e.Object_ID;
 					m_Spawned = 4;
                     m_SC.Freeze_AI(m_ObjectID, m_Data.OnGround);
-                    m_LastAIUpdate = DateTimeEx.UtcNow;
+                    m_LastAIUpdate = DateTimeEx.UtcNowMilli;
 #if DEBUG
 					Log.LogMessage("Peer [" + CallSign + "] Reçu Object_ID = " + m_ObjectID.ToString(), Color.DarkBlue, 1);
 #endif
@@ -283,7 +283,7 @@ namespace ffs2play
 				Title_Changed = true;
 			}
             m_SendData.Clone(e.Data);
-            if ((e.Data.TimeStamp - m_LastStateEvent).TotalMilliseconds < m_SendInterval) return;
+            if ((e.Data.TimeStamp - m_LastStateEvent) < m_SendInterval) return;
 			if ((!m_OnLine) || (m_EP == null) || (m_Version < 1)) return;
             //On envoi les données aux peers
             SendData();

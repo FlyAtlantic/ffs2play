@@ -98,10 +98,11 @@ namespace ffs2play
         {
             try
             {
-                RegistryKey registryKey = Registry.LocalMachine.OpenSubKey("Software\\" + Key);
+                RegistryKey localKey = RegistryKey.OpenBaseKey(Microsoft.Win32.RegistryHive.LocalMachine, RegistryView.Registry64);
+                RegistryKey registryKey = localKey.OpenSubKey("Software\\" + Key);
                 if (registryKey == null)
                 {
-                    registryKey = Registry.LocalMachine.OpenSubKey("Software\\WOW6432Node\\" + Key);
+                    registryKey = localKey.OpenSubKey("Software\\WOW6432Node\\" + Key);
                     if (registryKey == null)
                     {
 #if DEBUG

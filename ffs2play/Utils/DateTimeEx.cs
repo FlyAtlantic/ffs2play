@@ -53,18 +53,26 @@ namespace ffs2play
             }
         }
 
+        public static long UtcNowMilli
+        {
+            get
+            {
+                return (UtcNow.Ticks - UnixEpoch.Ticks) / TimeSpan.TicksPerMillisecond;
+            }
+        }
+
         private static void Reset()
         {
             _startTime = DateTime.UtcNow;
             _stopWatch = Stopwatch.StartNew();
         }
 
-        public static ulong UnixTimestampFromDateTime(DateTime date)
+        public static long UnixTimestampFromDateTime(DateTime date)
         {
-            return (ulong)(date - UnixEpoch).TotalMilliseconds;
+            return (date.Ticks - UnixEpoch.Ticks) / TimeSpan.TicksPerMillisecond;
         }
 
-        public static DateTime TimeFromUnixTimestamp(ulong millis)
+        public static DateTime TimeFromUnixTimestamp(long millis)
         {
             return UnixEpoch.AddMilliseconds(millis);
         }

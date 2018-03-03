@@ -96,7 +96,7 @@ namespace ffs2play
 
         private string m_sAESKey;
         private string Crypted_AESKey;
-		private DateTime LastGoodUpdate;
+		private long LastGoodUpdate;
 		private PirepUser User;
         private XmlDocument SendHello;
         private XmlDocument SendVerify;
@@ -121,7 +121,7 @@ namespace ffs2play
 			AutoExit = false;
 			m_SyncAIDone = false;
 			Log = Logger.Instance;
-			LastGoodUpdate = DateTimeEx.UtcNow;
+			LastGoodUpdate = DateTimeEx.UtcNowMilli;
             Mapping = AIMapping.Instance;
 			try
 			{

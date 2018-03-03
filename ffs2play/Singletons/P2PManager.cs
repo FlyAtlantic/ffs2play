@@ -867,7 +867,7 @@ namespace ffs2play
 							Sub.Text = string.Format("{0:0.0} Nm", Pair.Ecart);
 							break;
 						case "Last Update":
-							Sub.Text = string.Format(Pair.LastAIUpdate.ToLongTimeString());
+							Sub.Text = string.Format(DateTimeEx.TimeFromUnixTimestamp(Pair.LastAIUpdate).ToLongTimeString());
 							break;
 					}
 				}
