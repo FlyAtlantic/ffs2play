@@ -519,14 +519,14 @@ namespace ffs2play
 				Init.Pitch = m_Data.Pitch;
 				Init.Bank = m_Data.Bank;
 				Init.OnGround = Convert.ToUInt32(m_Data.OnGround);
-                try
-                {
-                    Init.Airspeed = Convert.ToUInt32(m_Data.IASSpeed);
-                }
-                catch (Exception ex)
-                {
-                    Init.Airspeed = 0;
-                }
+				try
+				{
+					Init.Airspeed = Convert.ToUInt32(m_Data.IASSpeed);
+				}
+				catch (Exception ex)
+				{
+					Init.Airspeed = 0;
+				}
 				if (m_Data.Category == "Helicopter") m_TrySimpleAI = true;
 				m_TimerCreateAI.Start();
 #if DEBUG
