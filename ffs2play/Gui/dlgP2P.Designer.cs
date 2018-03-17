@@ -42,14 +42,15 @@
             this.numPort = new System.Windows.Forms.NumericUpDown();
             this.label2 = new System.Windows.Forms.Label();
             this.gbMultijoueur = new System.Windows.Forms.GroupBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.numAILimite = new System.Windows.Forms.NumericUpDown();
             this.label10 = new System.Windows.Forms.Label();
             this.cbInfoSim = new System.Windows.Forms.CheckBox();
             this.label8 = new System.Windows.Forms.Label();
             this.numAIRayon = new System.Windows.Forms.NumericUpDown();
             this.label7 = new System.Windows.Forms.Label();
-            this.cbEnableP2P = new System.Windows.Forms.CheckBox();
             this.gbTunning = new System.Windows.Forms.GroupBox();
+            this.label11 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.numP2PTx = new System.Windows.Forms.NumericUpDown();
@@ -59,10 +60,10 @@
             this.lvItems = new System.Windows.Forms.ListViewEx();
             this.Emplacement = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.label9 = new System.Windows.Forms.Label();
-            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.label5 = new System.Windows.Forms.Label();
             this.cbBeta = new System.Windows.Forms.CheckBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -248,13 +249,13 @@
             // gbMultijoueur
             // 
             this.gbMultijoueur.BackColor = System.Drawing.Color.Gray;
+            this.gbMultijoueur.Controls.Add(this.label6);
             this.gbMultijoueur.Controls.Add(this.numAILimite);
             this.gbMultijoueur.Controls.Add(this.label10);
             this.gbMultijoueur.Controls.Add(this.cbInfoSim);
             this.gbMultijoueur.Controls.Add(this.label8);
             this.gbMultijoueur.Controls.Add(this.numAIRayon);
             this.gbMultijoueur.Controls.Add(this.label7);
-            this.gbMultijoueur.Controls.Add(this.cbEnableP2P);
             this.gbMultijoueur.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gbMultijoueur.ForeColor = System.Drawing.Color.White;
             this.gbMultijoueur.Location = new System.Drawing.Point(3, 3);
@@ -264,6 +265,16 @@
             this.gbMultijoueur.TabStop = false;
             this.gbMultijoueur.Text = "Multijoueur";
             // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(167, 9);
+            this.label6.MaximumSize = new System.Drawing.Size(130, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(126, 39);
+            this.label6.TabIndex = 13;
+            this.label6.Text = "La limite AI restreint le nombre d\'AI affichés aux plus proches. Illimité=-1";
+            // 
             // numAILimite
             // 
             this.numAILimite.Location = new System.Drawing.Point(240, 60);
@@ -272,15 +283,20 @@
             0,
             0,
             0});
+            this.numAILimite.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            -2147483648});
             this.numAILimite.Name = "numAILimite";
             this.numAILimite.Size = new System.Drawing.Size(48, 20);
             this.numAILimite.TabIndex = 12;
             this.toolTip1.SetToolTip(this.numAILimite, "Définit le nombre maximum de joueurs visibles simultanément");
             this.numAILimite.Value = new decimal(new int[] {
-            10,
+            1,
             0,
             0,
-            0});
+            -2147483648});
             this.numAILimite.ValueChanged += new System.EventHandler(this.numAILimite_ValueChanged);
             // 
             // label10
@@ -341,21 +357,10 @@
             this.label7.TabIndex = 9;
             this.label7.Text = "Rayon AI";
             // 
-            // cbEnableP2P
-            // 
-            this.cbEnableP2P.AutoSize = true;
-            this.cbEnableP2P.Location = new System.Drawing.Point(9, 21);
-            this.cbEnableP2P.Name = "cbEnableP2P";
-            this.cbEnableP2P.Size = new System.Drawing.Size(131, 17);
-            this.cbEnableP2P.TabIndex = 0;
-            this.cbEnableP2P.Text = "Activer le support P2P";
-            this.toolTip1.SetToolTip(this.cbEnableP2P, "Autorise l\'utilisation du réseau pair à pair");
-            this.cbEnableP2P.UseVisualStyleBackColor = true;
-            this.cbEnableP2P.CheckedChanged += new System.EventHandler(this.cbEnableP2P_CheckedChanged);
-            // 
             // gbTunning
             // 
             this.gbTunning.BackColor = System.Drawing.Color.DarkGray;
+            this.gbTunning.Controls.Add(this.label11);
             this.gbTunning.Controls.Add(this.label4);
             this.gbTunning.Controls.Add(this.label3);
             this.gbTunning.Controls.Add(this.numP2PTx);
@@ -367,6 +372,17 @@
             this.gbTunning.TabIndex = 4;
             this.gbTunning.TabStop = false;
             this.gbTunning.Text = "Réglages Avancés";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(9, 41);
+            this.label11.MaximumSize = new System.Drawing.Size(200, 0);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(188, 39);
+            this.label11.TabIndex = 14;
+            this.label11.Text = "100 à 200 mSec : Avions militaires\r\n200 à 300 mSec : Avions de tourismes\r\n400 mse" +
+    "c : Liners";
             // 
             // label4
             // 
@@ -495,15 +511,6 @@
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Testeur de version Bêta";
             // 
-            // label5
-            // 
-            this.label5.Dock = System.Windows.Forms.DockStyle.Top;
-            this.label5.Location = new System.Drawing.Point(3, 16);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(404, 44);
-            this.label5.TabIndex = 2;
-            this.label5.Text = resources.GetString("label5.Text");
-            // 
             // cbBeta
             // 
             this.cbBeta.AutoSize = true;
@@ -515,6 +522,15 @@
             this.toolTip1.SetToolTip(this.cbBeta, resources.GetString("cbBeta.ToolTip"));
             this.cbBeta.UseVisualStyleBackColor = true;
             this.cbBeta.CheckedChanged += new System.EventHandler(this.cbBeta_CheckedChanged);
+            // 
+            // label5
+            // 
+            this.label5.Dock = System.Windows.Forms.DockStyle.Top;
+            this.label5.Location = new System.Drawing.Point(3, 16);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(404, 44);
+            this.label5.TabIndex = 2;
+            this.label5.Text = resources.GetString("label5.Text");
             // 
             // dlgP2P
             // 
@@ -561,7 +577,6 @@
 		private System.Windows.Forms.Label label2;
 		private System.Windows.Forms.NumericUpDown numPort;
 		private System.Windows.Forms.GroupBox gbMultijoueur;
-		private System.Windows.Forms.CheckBox cbEnableP2P;
 		private System.Windows.Forms.Button btnAppliquer;
 		private System.Windows.Forms.GroupBox gbTunning;
 		private System.Windows.Forms.Label label4;
@@ -583,5 +598,7 @@
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.CheckBox cbBeta;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label11;
     }
 }

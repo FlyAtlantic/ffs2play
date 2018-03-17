@@ -120,14 +120,6 @@
   <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
   </metadata>
-  <data name="cbBeta.ToolTip" xml:space="preserve">
-    <value>Active les fonctionnalité d'ouverture de port automatique sur votre routeur.
-Si votre routeur de permet pas cette fonctionnalité, ou si vous ne souhaitez pas l'utiliser,
-vous devrez alors ouvrir les ports manuellement</value>
-  </data>
-  <data name="label5.Text" xml:space="preserve">
-    <value>En cochant la case çi-dessous, j'accèpte d'être un testeur des versions Bêta de FFS2Play, je recevrai donc les toutes dernières versions en test et je suis disposé à subir les désagréments des bugs éventuels rencontrés.</value>
-  </data>
   <data name="cbUPNP.ToolTip" xml:space="preserve">
     <value>Active les fonctionnalité d'ouverture de port automatique sur votre routeur.
 Si votre routeur de permet pas cette fonctionnalité, ou si vous ne souhaitez pas l'utiliser,
@@ -140,4 +132,15 @@ Augmenter cette valeur peux stabiliser votre trajectoire vue par les autres
 300 ms = Avion de tourisme (VFR)
 500 ms = Avion de ligne (IFR)</value>
   </data>
+  <data name="cbBeta.ToolTip" xml:space="preserve">
+    <value>Active les fonctionnalité d'ouverture de port automatique sur votre routeur.
+Si votre routeur de permet pas cette fonctionnalité, ou si vous ne souhaitez pas l'utiliser,
+vous devrez alors ouvrir les ports manuellement</value>
+  </data>
+  <data name="label5.Text" xml:space="preserve">
+    <value>En cochant la case çi-dessous, j'accèpte d'être un testeur des versions Bêta de FFS2Play, je recevrai donc les toutes dernières versions en test et je suis disposé à subir les désagréments des bugs éventuels rencontrés.</value>
+  </data>
+  <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>25</value>
+  </metadata>
 </root>

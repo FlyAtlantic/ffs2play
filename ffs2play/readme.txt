@@ -49,3 +49,5 @@ Notes de révision:
 1.1.0  : Mise en compatibilité avec FFS2play2. Compilation avec la dernière SDK P3D 4 (pour la version spéciale P3D4)
 
 1.1.1  : Simplification du nouveau système de timer. Correction du bug Registry 34bit sur appli 32bit (Permet l'utilisation de FFS2Play 32bit sur P3DV4)
+
+1.1.2  : Ajout de la fonctionnalité -1 sur les nombres d'AI pour permettre un affichage illimité

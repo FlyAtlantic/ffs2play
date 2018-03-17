@@ -71,7 +71,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="P2PAILimite" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">10</Value>
+      <Value Profile="(Default)">-1</Value>
     </Setting>
     <Setting Name="MetarAutoEnable" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

@@ -220,7 +220,7 @@ namespace ffs2play
 				}
 			}
 			// Si on en a plus de visible que la limite alors on en choisi un pour le rendre invisible (les plus lointains)
-			if (NbVisible > Limite)
+			if ((NbVisible > Limite) && (Limite>-1))
 			{
 				//On rend le plus lointain invisible
 				Peers[PosLointain].Visible = false;
@@ -230,7 +230,7 @@ namespace ffs2play
 			}
 			//Sinon , si on a des invisibles et que le nombre de visibles est inférieur à la limite
 			//cela signifie qu'on a des invisibles qu'on peut afficher (les plus prêt)
-			else if ((NbInvisible > 0) && (NbVisible < Limite))
+			else if ((NbInvisible > 0) && ((NbVisible < Limite)||(Limite<0)))
 			{
 				Peers[PosPret].Visible = true;
 #if DEBUG

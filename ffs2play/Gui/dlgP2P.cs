@@ -60,7 +60,7 @@ namespace ffs2play
 			// cbShadow
 			// 
 			cbShadow.AutoSize = true;
-			cbShadow.Location = new Point(146, 21);
+			cbShadow.Location = new Point(9, 21);
 			cbShadow.Name = "cbShadow";
 			cbShadow.Size = new Size(141, 17);
 			cbShadow.TabIndex = 1;
@@ -73,7 +73,6 @@ namespace ffs2play
 			NeedP2PRestart = false;
 			NeedDBReload = false;
 			cbUPNP.Checked = Properties.Settings.Default.UPNPEnable;
-			cbEnableP2P.Checked = Properties.Settings.Default.P2PEnable;
 			cbInfoSim.Checked = Properties.Settings.Default.P2PInfoEnable;
 			numPort.Value = Properties.Settings.Default.P2PPort;
 			numP2PTx.Value = Properties.Settings.Default.P2PRate;
@@ -140,11 +139,7 @@ namespace ffs2play
 				Changes = true;
 				NeedP2PRestart = true;
 			}
-			if (cbEnableP2P.Checked != Properties.Settings.Default.P2PEnable)
-			{
-				Changes = true;
-				NeedP2PRestart = true;
-			}
+
 			if (cbInfoSim.Checked != Properties.Settings.Default.P2PInfoEnable)
 			{
 				Changes = true;
@@ -216,10 +211,6 @@ namespace ffs2play
 			{
 				Properties.Settings.Default.UPNPEnable = cbUPNP.Checked;
 			}
-			if (cbEnableP2P.Checked != Properties.Settings.Default.P2PEnable)
-			{
-				Properties.Settings.Default.P2PEnable = cbEnableP2P.Checked;
-			}
 			if (cbInfoSim.Checked != Properties.Settings.Default.P2PInfoEnable)
 			{
 				Properties.Settings.Default.P2PInfoEnable = cbInfoSim.Checked;
@@ -244,7 +235,7 @@ namespace ffs2play
 			}
 			if (numAILimite.Value != Properties.Settings.Default.P2PAILimite)
 			{
-				Properties.Settings.Default.P2PAILimite = (ushort)numAILimite.Value;
+				Properties.Settings.Default.P2PAILimite = (int)numAILimite.Value;
 			}
 			if (NeedP2PRestart)
 			{
@@ -279,20 +270,6 @@ namespace ffs2play
 
 		private void UpdateEnable()
 		{
-			if (cbEnableP2P.Checked)
-			{
-				cbUPNP.Enabled = true;
-#if DEBUG
-                cbShadow.Enabled = true;
-#endif
-			}
-			else
-			{
-				cbUPNP.Enabled = false;
-#if DEBUG
-                cbShadow.Enabled = false;
-#endif
-			}
 		}
 
 		private void btnOK_Click(object sender, EventArgs e)
