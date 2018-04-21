@@ -650,6 +650,7 @@ namespace ffs2play
 					cmd.CommandText += " Model like @model";
 				}
 			}
+			cmd.CommandText += " order by Titre";
 			SQLiteDataReader r = cmd.ExecuteReader();
 			if (r.StepCount > 0)
 			{
@@ -671,7 +672,7 @@ namespace ffs2play
 			if (!m_Initialized) return Liste;
 			SQLiteCommand cmd = m_DB.CreateCommand();
 			cmd.CommandType = CommandType.Text;
-			cmd.CommandText = "SELECT Distinct Categorie FROM " + m_Table;
+			cmd.CommandText = "SELECT Distinct Categorie FROM " + m_Table + " order by Categorie";
 			SQLiteDataReader r = cmd.ExecuteReader();
 			if (r.StepCount > 0)
 			{
@@ -689,7 +690,7 @@ namespace ffs2play
 			if (!m_Initialized) return Liste;
 			SQLiteCommand cmd = m_DB.CreateCommand();
 			cmd.CommandType = CommandType.Text;
-			cmd.CommandText = "SELECT Distinct Editeur FROM " + m_Table;
+			cmd.CommandText = "SELECT Distinct Editeur FROM " + m_Table + " order by Editeur";
 			SQLiteDataReader r = cmd.ExecuteReader();
 			if (r.StepCount > 0)
 			{
@@ -707,7 +708,7 @@ namespace ffs2play
 			if (!m_Initialized) return Liste;
 			SQLiteCommand cmd = m_DB.CreateCommand();
 			cmd.CommandType = CommandType.Text;
-			cmd.CommandText = "SELECT Distinct Type FROM " + m_Table;
+			cmd.CommandText = "SELECT Distinct Type FROM " + m_Table + " order by Type";
 			SQLiteDataReader r = cmd.ExecuteReader();
 			if (r.StepCount > 0)
 			{
@@ -725,7 +726,7 @@ namespace ffs2play
 			if (!m_Initialized) return Liste;
 			SQLiteCommand cmd = m_DB.CreateCommand();
 			cmd.CommandType = CommandType.Text;
-			cmd.CommandText = "SELECT Distinct Model FROM " + m_Table;
+			cmd.CommandText = "SELECT Distinct Model FROM " + m_Table + " order by Model";
 			SQLiteDataReader r = cmd.ExecuteReader();
 			if (r.StepCount > 0)
 			{

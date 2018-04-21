@@ -584,7 +584,7 @@ namespace ffs2play
 
 		private void btnAide_Click(object sender, EventArgs e)
 		{
-			System.Diagnostics.Process.Start("http://ffs2p.ffsimulateur2.fr/viewtopic.php?f=209&t=14308");
+			Process.Start("https://ffs2play.fr/page/documentation");
 		}
 
         /// <summary>

@@ -291,6 +291,12 @@ namespace ffs2play
 							case "iaspeed":
 								child.InnerText = string.Format("{0:0.}", Analyse.GetLastState().IASSpeed);
 								break;
+							case "squawk":
+								child.InnerText = string.Format("{0:0.}", Outils.ConvertToBinaryCodedDecimal(Analyse.GetLastState().Squawk));
+								break;
+							case "onground":
+								child.InnerText = string.Format("{0:0.}", Convert.ToInt32(Analyse.GetLastState().OnGround));
+								break;
 						}
 					}
 				}
@@ -500,6 +506,8 @@ namespace ffs2play
 					xmlLiveUpdate2.AppendChild(Doc.CreateElement(string.Empty, "altitude", string.Empty)); //Création de la balise altitude
 					xmlLiveUpdate2.AppendChild(Doc.CreateElement(string.Empty, "groundSpeed", string.Empty)); //Création de la balise groundSpeed
 					xmlLiveUpdate2.AppendChild(Doc.CreateElement(string.Empty, "iaspeed", string.Empty)); //Création de la balise iaspeed
+					xmlLiveUpdate2.AppendChild(Doc.CreateElement(string.Empty, "squawk", string.Empty)); //Création de la balise squawk
+					xmlLiveUpdate2.AppendChild(Doc.CreateElement(string.Empty, "onground", string.Empty)); //Création de la balise onground
 					break;
 				case XmlCode.atc:
 					//Création de la balise liveupdate
@@ -511,7 +519,7 @@ namespace ffs2play
 					xmlAtc.AppendChild(Doc.CreateElement(string.Empty, "altitude", string.Empty)); //Création de la balise altitude
 					xmlAtc.AppendChild(Doc.CreateElement(string.Empty, "groundSpeed", string.Empty)); //Création de la balise groundSpeed
 					xmlAtc.AppendChild(Doc.CreateElement(string.Empty, "iaspeed", string.Empty)); //Création de la balise iaspeed
-					xmlAtc.AppendChild(Doc.CreateElement(string.Empty, "squawk", string.Empty)); //Création de la balise iaspeed
+					xmlAtc.AppendChild(Doc.CreateElement(string.Empty, "squawk", string.Empty)); //Création de la balise squawk
 					break;
 				case XmlCode.syncai:
 					XmlElement xmlSyncAI = Doc.CreateElement(string.Empty, "syncai", string.Empty);

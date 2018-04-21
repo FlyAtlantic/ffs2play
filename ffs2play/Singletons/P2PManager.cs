@@ -48,6 +48,8 @@ namespace ffs2play
 		private List<Peer> Peers;
         private Logger Log;
 		private AIMapping m_Mapper;
+		private SCManager m_SCM;
+		private AnalyseurManager m_Analyseur;
         private bool m_bUPNP;
         private int m_Port;
 		private IPAddress m_ExternalIP;
@@ -136,6 +138,9 @@ namespace ffs2play
 			Peers = new List<Peer>();
 			Discoverer = new NatDiscoverer();
 			m_InternalIP = new List<IPAddress>();
+			m_SCM = SCManager.Instance;
+			m_Analyseur = AnalyseurManager.Instance;
+			m_Analyseur.OnStateChange += M_Analyseur_OnStateChange;
 			CheckAI = new System.Timers.Timer(5000);
 			CheckAI.Elapsed += CheckAI_Elapsed;
             CheckPropertiesData();
@@ -366,6 +371,20 @@ namespace ffs2play
 				Server.Stop();
 				InitUPNP(false);
 				Clear();
+			}
+		}
+
+		private void M_Analyseur_OnStateChange(object sender, AnalyseurStateEvent e)
+		{
+			if ((e.Data.OnGround==true)&&(m_Analyseur.ADernier.OnGround==false)&&Properties.Settings.Default.EnaDropDisp)
+			{
+				string Message = string.Format("Taux de chute : {0:0.} ft/min", e.Data.Vario);
+				Log.LogMessage(DateTime.Now.ToShortTimeString() + " :" + Message);
+				m_SCM.SendScrollingText(Message);
+				if (Properties.Settings.Default.EnaDropSend)
+				{
+					Send_Tchat(Message);
+				}
 			}
 		}
 

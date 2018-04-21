@@ -53,3 +53,9 @@ Notes de révision:
 1.1.2  : Ajout de la fonctionnalité -1 sur les nombres d'AI pour permettre un affichage illimité
 
 1.1.3  : Correction BUG IAS négatif à la création de l'AI.
+
+1.1.4  : Données supplémentaires pour le contrôle ATC
+
+1.1.5  : Classement alphabétique des filtres dans le menu des remplacement des AI
+
+1.1.6  : Ajout de l'affichage du taux de chute avec la possibilité de le publier sur de réseau

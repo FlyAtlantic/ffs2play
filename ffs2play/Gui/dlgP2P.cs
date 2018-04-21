@@ -79,6 +79,8 @@ namespace ffs2play
 			numAIRayon.Value = Properties.Settings.Default.P2PRadius;
 			numAILimite.Value = Properties.Settings.Default.P2PAILimite;
             cbBeta.Checked = Properties.Settings.Default.Beta;
+			cbDropRateDisp.Checked = Properties.Settings.Default.EnaDropDisp;
+			cbSendDropRate.Checked = Properties.Settings.Default.EnaDropSend;
 			btnAppliquer.Enabled = false;
 			btnAppliquer.BackColor = Color.LightGray;
 			btnAppliquer.ForeColor = Color.Black;
@@ -151,6 +153,14 @@ namespace ffs2play
 				NeedP2PRestart = true;
 			}
 #endif
+			if (cbDropRateDisp.Checked != Properties.Settings.Default.EnaDropDisp)
+			{
+				Changes = true;
+			}
+			if (cbSendDropRate.Checked != Properties.Settings.Default.EnaDropSend)
+			{
+				Changes = true;
+			}
 			if (numPort.Value != Properties.Settings.Default.P2PPort)
 			{
 				Changes = true;
@@ -221,6 +231,14 @@ namespace ffs2play
 				Properties.Settings.Default.ShadowEnable = cbShadow.Checked;
 			}
 #endif
+			if (cbDropRateDisp.Checked != Properties.Settings.Default.EnaDropDisp)
+			{
+				Properties.Settings.Default.EnaDropDisp = cbDropRateDisp.Checked;
+			}
+			if (cbSendDropRate.Checked != Properties.Settings.Default.EnaDropSend)
+			{
+				Properties.Settings.Default.EnaDropSend = cbSendDropRate.Checked;
+			}
 			if (numPort.Value != Properties.Settings.Default.P2PPort)
 			{
 				Properties.Settings.Default.P2PPort = (ushort)numPort.Value;
@@ -358,5 +376,15 @@ namespace ffs2play
         {
             CheckChanges();
         }
-    }
+
+		private void cbDropRateDisp_CheckedChanged(object sender, EventArgs e)
+		{
+			CheckChanges();
+		}
+
+		private void cbSendDropRate_CheckedChanged(object sender, EventArgs e)
+		{
+			CheckChanges();
+		}
+	}
 }

@@ -1,0 +1,15 @@
+﻿<Properties StartupConfiguration="{6947B26B-8E81-486A-A863-AD8C0436AB0A}|Default">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Net/Peer.cs">
+    <Files>
+      <File FileName="Net/Peer.Event.cs" Line="1" Column="1" />
+      <File FileName="Net/Peer.cs" Line="581" Column="57" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.FFS2Play PreferredExecutionTarget="MonoDevelop.Default" />
+  <MultiItemStartupConfigurations />
+</Properties>

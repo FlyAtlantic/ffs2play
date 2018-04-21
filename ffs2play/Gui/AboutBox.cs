@@ -49,7 +49,7 @@ namespace ffs2play
 			this.labelProductName.Text = entryAssemblyInfo.Product;
 			this.labelVersion.Text = String.Format("Version {0}", entryAssemblyInfo.Version) + " " + Platform;
 			this.labelCopyright.Text = entryAssemblyInfo.Copyright;
-			this.labelCompanyName.Text = "http://www.ffsimulateur2.fr";
+			this.labelCompanyName.Text = "https://www.ffs2play.fr";
 			this.textBoxDescription.Text = entryAssemblyInfo.Description;
 		}
 
@@ -60,7 +60,7 @@ namespace ffs2play
 
 		private void labelCompanyName_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
 		{
-			System.Diagnostics.Process.Start("http://www.ffsimulateur2.fr");
+			System.Diagnostics.Process.Start("https://www.ffs2play.fr");
 			labelCompanyName.LinkVisited = true;
 		}
 	}

@@ -39,10 +39,10 @@ namespace ffs2play
 	{
 		public List<AircraftState> Enregistrement;
 		private AircraftState Dernier;
-		private AircraftState ADernier;
+		public AircraftState ADernier;
 		private Logger Log;
 		private SCManager SCM;
-
+		private bool m_FirstScan;
 		private AnalyseurManager()
 		{
 			Log = Logger.Instance;
@@ -61,7 +61,9 @@ namespace ffs2play
             SCM.OnSCReceiveVariable += OnSCReceiveVariable;
 			Dernier = new AircraftState();
 			ADernier = new AircraftState(Dernier);
-        }
+			m_FirstScan = true;
+
+		}
 
         public static AnalyseurManager Instance
 		{
@@ -307,6 +309,11 @@ namespace ffs2play
 			Dernier.StateEng2 = Convert.ToBoolean(Donnees.StateEng2);
 			Dernier.StateEng3 = Convert.ToBoolean(Donnees.StateEng3);
 			Dernier.StateEng4 = Convert.ToBoolean(Donnees.StateEng4);
+			if (m_FirstScan)
+			{
+				ADernier.Clone(Dernier);
+				m_FirstScan = false;
+			}
 			FireStateChange(Dernier);
 			ADernier.Clone(Dernier);
 		}
