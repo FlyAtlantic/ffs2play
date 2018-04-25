@@ -297,6 +297,9 @@ namespace ffs2play
 							case "onground":
 								child.InnerText = string.Format("{0:0.}", Convert.ToInt32(Analyse.GetLastState().OnGround));
 								break;
+							case "sim":
+								child.InnerText = SCM.GetVersion().ToString();
+								break;
 						}
 					}
 				}
@@ -508,6 +511,7 @@ namespace ffs2play
 					xmlLiveUpdate2.AppendChild(Doc.CreateElement(string.Empty, "iaspeed", string.Empty)); //Création de la balise iaspeed
 					xmlLiveUpdate2.AppendChild(Doc.CreateElement(string.Empty, "squawk", string.Empty)); //Création de la balise squawk
 					xmlLiveUpdate2.AppendChild(Doc.CreateElement(string.Empty, "onground", string.Empty)); //Création de la balise onground
+					xmlLiveUpdate2.AppendChild(Doc.CreateElement(string.Empty, "sim", string.Empty)); //Création de la balise simulateur
 					break;
 				case XmlCode.atc:
 					//Création de la balise liveupdate

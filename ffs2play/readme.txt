@@ -59,3 +59,5 @@ Notes de révision:
 1.1.5  : Classement alphabétique des filtres dans le menu des remplacement des AI
 
 1.1.6  : Ajout de l'affichage du taux de chute avec la possibilité de le publier sur de réseau
+
+1.1.7  : Ajout du simulateur utilisé dans le protocole serveur
